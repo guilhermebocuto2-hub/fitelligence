@@ -1,0 +1,143 @@
+{
+  "gerado_em": "2026-03-30T18:42:20.811Z",
+  "total_candidatos_remocao_segura": 5,
+  "candidatos_remocao_segura": [
+    {
+      "onboarding_id": 1,
+      "usuario_id": 5,
+      "secao_canonica": "motivacao",
+      "id_linha": 5,
+      "secao_original": "motivation",
+      "motivo": "duplicidade_semantica",
+      "linha_vencedora_id": 12
+    },
+    {
+      "onboarding_id": 1,
+      "usuario_id": 5,
+      "secao_canonica": "nutricao",
+      "id_linha": 4,
+      "secao_original": "nutrition",
+      "motivo": "duplicidade_semantica",
+      "linha_vencedora_id": 11
+    },
+    {
+      "onboarding_id": 1,
+      "usuario_id": 5,
+      "secao_canonica": "rotina",
+      "id_linha": 3,
+      "secao_original": "routine",
+      "motivo": "duplicidade_semantica",
+      "linha_vencedora_id": 10
+    },
+    {
+      "onboarding_id": 1,
+      "usuario_id": 5,
+      "secao_canonica": "dados-fisicos",
+      "id_linha": 2,
+      "secao_original": "body_data",
+      "motivo": "duplicidade_semantica",
+      "linha_vencedora_id": 9
+    },
+    {
+      "onboarding_id": 1,
+      "usuario_id": 5,
+      "secao_canonica": "objetivo",
+      "id_linha": 1,
+      "secao_original": "goal",
+      "motivo": "duplicidade_semantica",
+      "linha_vencedora_id": 8
+    }
+  ],
+  "conflitos_processados": [
+    {
+      "onboarding_id": 1,
+      "usuario_id": 5,
+      "secao_canonica": "motivacao",
+      "manter": {
+        "id": 12,
+        "secao_original": "motivacao",
+        "ehCanonica": true,
+        "atualizada_para_canonica": false
+      },
+      "reconciliar": [
+        {
+          "id": 5,
+          "secao_original": "motivation",
+          "ehCanonica": false
+        }
+      ]
+    },
+    {
+      "onboarding_id": 1,
+      "usuario_id": 5,
+      "secao_canonica": "nutricao",
+      "manter": {
+        "id": 11,
+        "secao_original": "alimentacao",
+        "ehCanonica": false,
+        "atualizada_para_canonica": true
+      },
+      "reconciliar": [
+        {
+          "id": 4,
+          "secao_original": "nutrition",
+          "ehCanonica": false
+        }
+      ]
+    },
+    {
+      "onboarding_id": 1,
+      "usuario_id": 5,
+      "secao_canonica": "rotina",
+      "manter": {
+        "id": 10,
+        "secao_original": "rotina",
+        "ehCanonica": true,
+        "atualizada_para_canonica": false
+      },
+      "reconciliar": [
+        {
+          "id": 3,
+          "secao_original": "routine",
+          "ehCanonica": false
+        }
+      ]
+    },
+    {
+      "onboarding_id": 1,
+      "usuario_id": 5,
+      "secao_canonica": "dados-fisicos",
+      "manter": {
+        "id": 9,
+        "secao_original": "dados-fisicos",
+        "ehCanonica": true,
+        "atualizada_para_canonica": false
+      },
+      "reconciliar": [
+        {
+          "id": 2,
+          "secao_original": "body_data",
+          "ehCanonica": false
+        }
+      ]
+    },
+    {
+      "onboarding_id": 1,
+      "usuario_id": 5,
+      "secao_canonica": "objetivo",
+      "manter": {
+        "id": 8,
+        "secao_original": "objetivo",
+        "ehCanonica": true,
+        "atualizada_para_canonica": false
+      },
+      "reconciliar": [
+        {
+          "id": 1,
+          "secao_original": "goal",
+          "ehCanonica": false
+        }
+      ]
+    }
+  ]
+}

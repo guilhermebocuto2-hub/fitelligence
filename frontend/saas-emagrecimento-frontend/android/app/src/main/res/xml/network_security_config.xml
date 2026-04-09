@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!--
+      Configuracao de desenvolvimento:
+      permite trafego HTTP (cleartext) para facilitar testes locais no Android.
+      Em producao, o recomendado e usar HTTPS.
+    -->
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

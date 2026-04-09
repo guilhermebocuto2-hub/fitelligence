@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #f9fafb;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  /* Espaçamento vertical padrão entre blocos de seção */
+  .mt-section {
+    @apply mt-6;
+  }
+}

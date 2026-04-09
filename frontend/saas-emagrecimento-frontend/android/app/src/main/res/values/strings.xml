@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Fitelligence</string>
+    <string name="title_activity_main">Fitelligence</string>
+    <string name="package_name">com.fitelligence.app</string>
+    <string name="custom_url_scheme">com.fitelligence.app</string>
+</resources>

@@ -1,0 +1,39 @@
+# backend
+/backend/node_modules
+/backend/uploads
+/backend/logs
+/backend/*.log
+
+# frontend
+/frontend/saas-emagrecimento-frontend/node_modules
+/frontend/saas-emagrecimento-frontend/.next
+/frontend/saas-emagrecimento-frontend/out
+/frontend/saas-emagrecimento-frontend/dist
+/frontend/saas-emagrecimento-frontend/android/build
+/frontend/saas-emagrecimento-frontend/android/app/build
+/frontend/saas-emagrecimento-frontend/android/.gradle
+/frontend/saas-emagrecimento-frontend/android/local.properties
+
+# genérico
+node_modules
+**/node_modules
+.next
+**/.next
+out
+dist
+build
+uploads
+logs
+*.log
+.env
+.env.local
+.env.*
+!.env.example
+desktop.ini
+.DS_Store
+Thumbs.db
+*.sqlite
+*.db
+# next build COMPLETO
+/frontend/saas-emagrecimento-frontend/.next
+**/.next
