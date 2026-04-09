@@ -11,7 +11,7 @@
 // ======================================================
 // URL base da API vinda do .env.local
 // Exemplo:
-// NEXT_PUBLIC_API_URL=http://SEU_IP_LOCAL:3001
+// NEXT_PUBLIC_API_URL=https://fitelligence-production.up.railway.app
 // ======================================================
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
