@@ -1,4 +1,4 @@
-const stripe = require("../services/stripeService");
+const getStripe = require("../services/stripeService");
 const connection = require("../database/connection");
 
 // ======================================================
@@ -13,6 +13,8 @@ exports.handleStripeWebhook = async (req, res) => {
   let event;
 
   try {
+    const stripe = getStripe();
+
     // ====================================================
     // O Stripe exige o body bruto (raw body) para validar
     // corretamente a assinatura do webhook

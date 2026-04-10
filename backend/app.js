@@ -140,9 +140,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/', (req, res) => {
+  return res.status(200).send('Fitelligence backend online');
+});
+
+app.get('/health', (req, res) => {
   return res.status(200).json({
-    success: true,
-    message: 'API SaaS Emagrecimento com IA rodando com sucesso'
+    status: 'ok',
   });
 });
 
@@ -171,7 +174,7 @@ app.use('/chat', chatRoutes);
 
 app.use('/debug', debugRoutes);
 
-app.use(errorMiddleware);
 app.use("/onboarding", onboardingRoutes);
+app.use(errorMiddleware);
 
 module.exports = app;

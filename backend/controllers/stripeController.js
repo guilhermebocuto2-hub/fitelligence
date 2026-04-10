@@ -1,4 +1,4 @@
-const stripe = require("../services/stripeService");
+const getStripe = require("../services/stripeService");
 const connection = require("../database/connection");
 
 // ======================================================
@@ -44,6 +44,8 @@ function getStripePriceIdByBillingCycle(billingCycle) {
 // ======================================================
 exports.criarCheckoutSession = async (req, res) => {
   try {
+    const stripe = getStripe();
+
     // ====================================================
     // Recupera usuário autenticado
     // ====================================================
@@ -198,6 +200,7 @@ exports.criarCheckoutSession = async (req, res) => {
 // ======================================================
 exports.buscarCheckoutSession = async (req, res) => {
   try {
+    const stripe = getStripe();
     const { session_id } = req.query;
 
     if (!session_id) {
@@ -228,6 +231,7 @@ exports.buscarCheckoutSession = async (req, res) => {
 // ======================================================
 exports.criarPortalSession = async (req, res) => {
   try {
+    const stripe = getStripe();
     const usuarioId = getUsuarioIdFromRequest(req);
 
     if (!usuarioId) {

@@ -8,9 +8,24 @@
 const Stripe = require("stripe");
 
 // ======================================================
-// Instância oficial do Stripe
-// Usa a chave secreta do ambiente
+// Inicialização resiliente do Stripe
+// Evita derrubar o bootstrap se a env ainda não existir
 // ======================================================
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+let stripeInstance = null;
 
-module.exports = stripe;
+function getStripe() {
+  if (stripeInstance) {
+    return stripeInstance;
+  }
+
+  if (!process.env.STRIPE_SECRET_KEY) {
+    const error = new Error("STRIPE_SECRET_KEY não configurada.");
+    error.statusCode = 503;
+    throw error;
+  }
+
+  stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
+  return stripeInstance;
+}
+
+module.exports = getStripe;
