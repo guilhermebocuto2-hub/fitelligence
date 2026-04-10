@@ -47,20 +47,20 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin(origin, callback) {
-    // Permite requests sem origin (ex: Postman, mobile)
-    if (!origin) {
-      logCorsDebug("origin ausente aceito");
-      return callback(null, true);
-    }
+  if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
+  // 🔥 libera tudo temporariamente (fase dev)
+  if (isDevelopment) {
+    return callback(null, true);
+  }
 
-    console.error("CORS bloqueado para:", origin);
+  if (allowedOrigins.includes(origin)) {
+    return callback(null, true);
+  }
 
-    return callback(new Error('CORS bloqueado em produção'));
-  },
+  console.warn("CORS bloqueado para:", origin);
+  return callback(null, false);
+},
   credentials: true
 };
 
