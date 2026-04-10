@@ -45,6 +45,113 @@ const pool = railwayDatabaseUrl
     });
 
 // ======================================================
+// Schema base das tabelas de onboarding
+// - Mantém compatibilidade com onboardingModel
+// - Evita criar arquitetura nova desnecessária
+// ======================================================
+const onboardingColumns = {
+  usuario_id: "INT NOT NULL",
+  perfil_tipo: "VARCHAR(50) NULL",
+  etapa_atual: "INT NULL",
+  status: "VARCHAR(50) NULL",
+  concluido_em: "DATETIME NULL",
+};
+
+const onboardingRespostasColumns = {
+  onboarding_id: "INT NOT NULL",
+  usuario_id: "INT NOT NULL",
+  perfil_tipo: "VARCHAR(50) NULL",
+  secao: "VARCHAR(100) NOT NULL",
+  respostas_json: "LONGTEXT NULL",
+};
+
+// ======================================================
+// Garante a tabela onboardings
+// ======================================================
+async function ensureOnboardingsTable(connection) {
+  await connection.query(`
+    CREATE TABLE IF NOT EXISTS onboardings (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      usuario_id INT NOT NULL,
+      perfil_tipo VARCHAR(50) NULL,
+      etapa_atual INT NULL,
+      status VARCHAR(50) NULL,
+      concluido_em DATETIME NULL
+    )
+  `);
+}
+
+// ======================================================
+// Garante a tabela onboarding_respostas
+// ======================================================
+async function ensureOnboardingRespostasTable(connection) {
+  await connection.query(`
+    CREATE TABLE IF NOT EXISTS onboarding_respostas (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      onboarding_id INT NOT NULL,
+      usuario_id INT NOT NULL,
+      perfil_tipo VARCHAR(50) NULL,
+      secao VARCHAR(100) NOT NULL,
+      respostas_json LONGTEXT NULL
+    )
+  `);
+}
+
+// ======================================================
+// Adiciona colunas faltantes de forma incremental
+// - Preserva dados existentes
+// - Evita depender de ADD COLUMN IF NOT EXISTS
+// ======================================================
+async function ensureTableColumns(connection, tableName, columnsMap) {
+  const [rows] = await connection.query(
+    `
+      SELECT COLUMN_NAME
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = ?
+    `,
+    [tableName]
+  );
+
+  const existingColumns = new Set(rows.map((row) => row.COLUMN_NAME));
+
+  for (const [columnName, columnDefinition] of Object.entries(columnsMap)) {
+    if (existingColumns.has(columnName)) {
+      continue;
+    }
+
+    await connection.query(
+      `ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDefinition}`
+    );
+
+    console.log(`Coluna ${columnName} adicionada na tabela ${tableName}`);
+  }
+}
+
+// ======================================================
+// Inicialização da estrutura de onboarding
+// - Garante tabelas e colunas esperadas pelo fluxo atual
+// - Não derruba o servidor se falhar isoladamente
+// ======================================================
+async function initializeOnboardingTables(connection) {
+  try {
+    await ensureOnboardingsTable(connection);
+    await ensureTableColumns(connection, "onboardings", onboardingColumns);
+    console.log("Tabela onboardings verificada/criada com sucesso");
+
+    await ensureOnboardingRespostasTable(connection);
+    await ensureTableColumns(
+      connection,
+      "onboarding_respostas",
+      onboardingRespostasColumns
+    );
+    console.log("Tabela onboarding_respostas verificada/criada com sucesso");
+  } catch (err) {
+    console.error("Erro ao inicializar estrutura de onboarding:", err);
+  }
+}
+
+// ======================================================
 // Definição compatível da tabela usuarios
 // - Mantém o schema alinhado com o que o UsuarioModel já
 //   consulta hoje no projeto
@@ -206,7 +313,8 @@ async function initializeDatabase() {
     console.log("Tabela usuarios verificada/criada com sucesso");
     await ensureUsuariosColumns(connection);
     await ensureUsuariosIndexes(connection);
-    console.log("Estrutura da tabela usuarios validada com sucesso");
+    await initializeOnboardingTables(connection);
+    console.log("Estrutura das tabelas usuarios e onboarding validada com sucesso");
   } catch (err) {
     console.error("Erro ao inicializar estrutura da tabela usuarios:", err);
   } finally {

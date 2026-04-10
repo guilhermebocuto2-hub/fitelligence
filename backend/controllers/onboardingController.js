@@ -10,6 +10,10 @@ exports.buscarOnboarding = async (req, res) => {
     // ======================================================
     const usuarioId = req.user.id;
 
+    console.log("[ONBOARDING] rota GET /onboarding acessada", {
+      usuarioId,
+    });
+
     const resultado = await onboardingService.buscarOnboardingCompleto(usuarioId);
 
     return res.status(200).json({

@@ -539,11 +539,25 @@ async function criarMetaInicialSeAplicavel({
 // - devolver objeto pronto para o frontend
 // ======================================================
 exports.buscarOnboardingCompleto = async (usuarioId) => {
+  console.log("[ONBOARDING] buscarOnboardingCompleto iniciado", {
+    usuarioId,
+  });
+
   const onboarding = await onboardingModel.buscarOnboardingPorUsuario(usuarioId);
 
   if (!onboarding) {
+    console.log("[ONBOARDING] nenhum onboarding encontrado para o usuário", {
+      usuarioId,
+    });
     return null;
   }
+
+  console.log("[ONBOARDING] onboarding encontrado", {
+    usuarioId,
+    onboardingId: onboarding.id,
+    etapaAtual: onboarding.etapa_atual || null,
+    status: onboarding.status || null,
+  });
 
   const respostasSalvas = await onboardingModel.listarRespostas(onboarding.id);
   const respostasAgrupadas = agruparRespostasDoOnboarding(respostasSalvas);
