@@ -45,6 +45,42 @@ const pool = railwayDatabaseUrl
     });
 
 // ======================================================
+// Inicialização mínima da estrutura do banco
+// - Garante a existência da tabela usuarios
+// - Funciona tanto no Railway quanto no ambiente local
+// - Não derruba o servidor se a criação falhar
+// ======================================================
+async function initializeDatabase() {
+  let connection;
+
+  try {
+    connection = await pool.getConnection();
+
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS usuarios (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        nome VARCHAR(255) NULL,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        senha VARCHAR(255) NULL,
+        provider VARCHAR(50) NULL,
+        provider_id VARCHAR(255) NULL,
+        email_verificado TINYINT(1) DEFAULT 0,
+        avatar_url TEXT NULL,
+        deleted_at DATETIME NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `);
+
+    console.log("Tabela usuarios verificada/criada com sucesso");
+  } catch (err) {
+    console.error("Erro ao inicializar tabela usuarios:", err);
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
+// ======================================================
 // Teste inicial da conexão
 // No Railway, se o banco estiver indisponível no boot,
 // registramos o erro sem derrubar o servidor para evitar
@@ -57,6 +93,7 @@ async function testConnection() {
     connection = await pool.getConnection();
     await connection.ping();
     console.log("Conectado ao MySQL com sucesso");
+    await initializeDatabase();
   } catch (err) {
     console.error("Erro ao conectar no MySQL:", err);
   } finally {
