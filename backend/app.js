@@ -39,40 +39,29 @@ const isDevelopment = process.env.NODE_ENV !== "production";
 const logCorsDebug = (...args) => isDevelopment && console.log("[CORS-DEBUG]", ...args);
 
 // ================= CORS =================
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'https://fitelligence-production.up.railway.app'
+];
+
 const corsOptions = {
   origin(origin, callback) {
+    // Permite requests sem origin (ex: Postman, mobile)
     if (!origin) {
       logCorsDebug("origin ausente aceito");
       return callback(null, true);
     }
 
-    const isNullOriginLiteral = origin === "null";
-
-    if (isDevelopment) {
-      const isCapacitorLocal = origin === "capacitor://localhost";
-      const isLocalhost =
-        origin.startsWith("http://localhost") ||
-        origin.startsWith("http://127.0.0.1");
-
-      const isPrivateLanIp =
-        /^http:\/\/192\.168\.\d+\.\d+(?::\d+)?$/i.test(origin) ||
-        /^http:\/\/10\.\d+\.\d+\.\d+(?::\d+)?$/i.test(origin);
-
-      if (isCapacitorLocal || isLocalhost || isPrivateLanIp || isNullOriginLiteral) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("CORS bloqueado"));
-    }
-
-    const allowedOrigins = new Set([process.env.FRONTEND_URL].filter(Boolean));
-
-    if (allowedOrigins.has(origin)) {
+    if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
 
-    return callback(new Error("CORS bloqueado em produção"));
+    console.error("CORS bloqueado para:", origin);
+
+    return callback(new Error('CORS bloqueado em produção'));
   },
+  credentials: true
 };
 
 // ================= PRE-FLIGHT =================
@@ -110,14 +99,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ======================================================
-// 🚀 ROTA PRINCIPAL (RESOLVE ERRO DO RAILWAY)
+// ROTA PRINCIPAL
 // ======================================================
 app.get('/', (req, res) => {
-  res.status(200).send('🚀 Fitelligence API rodando com sucesso');
+  res.status(200).send('Fitelligence API rodando com sucesso');
 });
 
 // ======================================================
-// ❤️ HEALTH CHECK (PROFISSIONAL)
+// HEALTH CHECK
 // ======================================================
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
