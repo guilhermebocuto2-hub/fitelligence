@@ -12,6 +12,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Crown, ArrowRight } from "lucide-react";
 import PremiumCard from "../../../src/components/ui/PremiumCard";
 import SectionHeader from "../../../src/components/ui/SectionHeader";
 import { useAuth } from "../../../src/context/AuthContext";
@@ -25,6 +26,16 @@ export default function PerfilPage() {
   const [actionError, setActionError] = useState("");
 
   const privacyPolicyUrl = process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL || "";
+
+  // ====================================================
+  // Logout visivel no mobile:
+  // preserva o fluxo atual do AuthContext e garante
+  // retorno seguro para a tela de login.
+  // ====================================================
+  function handleLogout() {
+    logout();
+    router.replace("/login");
+  }
 
   async function handleDeleteAccount() {
     const confirmed = window.confirm(
@@ -61,6 +72,35 @@ export default function PerfilPage() {
           title="Perfil"
           subtitle="Dados principais da sua conta no Fitelligence."
         />
+
+        {/* Card de upgrade — visível apenas para usuários não-premium */}
+        {user?.plano !== "premium" ? (
+          <button
+            type="button"
+            onClick={() => router.push("/premium")}
+            className="w-full rounded-[24px] bg-gradient-to-r from-violet-600 to-indigo-600 p-5 text-left shadow-lg shadow-violet-500/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
+          >
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/15">
+                  <Crown className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/70">
+                    Plano atual: {String(user?.plano || "free").toUpperCase()}
+                  </p>
+                  <p className="mt-0.5 text-base font-bold text-white">
+                    Upgrade para Premium
+                  </p>
+                  <p className="mt-0.5 text-xs text-white/80">
+                    Desbloqueie análises avançadas, IA corporal e mais.
+                  </p>
+                </div>
+              </div>
+              <ArrowRight className="h-5 w-5 shrink-0 text-white/70" />
+            </div>
+          </button>
+        ) : null}
 
         <PremiumCard className="space-y-3">
           {/* =================================================
@@ -101,6 +141,21 @@ export default function PerfilPage() {
             title="Conta"
             subtitle="Ajustes importantes para privacidade e controle da sua conta."
           />
+
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p className="text-sm font-semibold text-slate-900">Sessão</p>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              Encerre seu acesso com segurança neste dispositivo.
+            </p>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="mt-3 inline-flex rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
+            >
+              Sair da conta
+            </button>
+          </div>
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-sm font-semibold text-slate-900">
