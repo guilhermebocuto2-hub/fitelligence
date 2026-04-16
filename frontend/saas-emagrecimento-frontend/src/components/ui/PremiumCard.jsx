@@ -17,11 +17,11 @@ export default function PremiumCard({
   return (
     <Component
       className={`
-        relative overflow-hidden rounded-3xl border border-slate-200/90 bg-white
+        relative overflow-hidden rounded-3xl border border-[#2A2A2A] bg-[#1A1A1A]
         ${compact ? "p-4 sm:p-5" : "p-5 sm:p-6"}
-        shadow-[0_10px_30px_rgba(15,23,42,0.08)]
-        ${interactive ? "transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(15,23,42,0.12)]" : ""}
-        ${glow ? "before:absolute before:right-0 before:top-0 before:h-28 before:w-28 before:rounded-full before:bg-emerald-100/60 before:blur-3xl before:content-['']" : ""}
+        shadow-[0_10px_30px_rgba(0,0,0,0.3)]
+        ${interactive ? "transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(0,0,0,0.45)]" : ""}
+        ${glow ? "before:absolute before:right-0 before:top-0 before:h-28 before:w-28 before:rounded-full before:bg-violet-500/10 before:blur-3xl before:content-['']" : ""}
         ${className}
       `}
     >

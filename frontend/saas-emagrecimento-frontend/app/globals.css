@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Dark mode ativado pela classe .dark no elemento html */
+@variant dark (&:where(.dark, .dark *));
+
 * {
   box-sizing: border-box;
 }
@@ -13,8 +16,8 @@ body {
 }
 
 body {
-  background: #f4f4f5;
-  color: #18181b;
+  background: #0F0F0F;
+  color: #FFFFFF;
 }
 
 button,
@@ -24,4 +27,20 @@ select {
   font: inherit;
 }
 
+/* =====================================================
+   Remove o spinner nativo de inputs numéricos
+   sem alterar o comportamento do campo.
+   Mantemos type="number" para preservar validação
+   existente e teclado numérico no mobile.
+   ===================================================== */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
 

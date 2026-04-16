@@ -51,8 +51,8 @@ function MobileBottomNavComponent() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 bg-transparent px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 lg:hidden">
-      <div className="mx-auto grid max-w-lg grid-cols-5 gap-1 rounded-[28px] border border-slate-200/80 bg-white/92 p-2 shadow-[0_18px_45px_rgba(15,23,42,0.18)] backdrop-blur-2xl">
+    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-[#2A2A2A] bg-[#0F0F0F] px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 lg:hidden">
+      <div className="mx-auto grid max-w-lg grid-cols-5 gap-1 rounded-[28px] border border-[#2A2A2A] bg-[#1A1A1A] p-2 shadow-[0_18px_45px_rgba(0,0,0,0.6)]">
         {mobileNavigation.map((item) => {
           const Icon = item.icon;
 
@@ -75,18 +75,16 @@ function MobileBottomNavComponent() {
               className={`group relative flex flex-col items-center justify-center gap-1.5 rounded-2xl px-1 py-3 text-[11px] font-medium transition-all duration-300 ${
                 isPremiumItem
                   ? isActive
-                    ? "bg-violet-100 text-violet-700 ring-1 ring-violet-300"
-                    : "text-violet-500 hover:bg-violet-50 hover:text-violet-700"
+                    ? "bg-[#7C3AED]/15 text-[#7C3AED]"
+                    : "text-[#7C3AED]/70 hover:bg-[#7C3AED]/10 hover:text-[#7C3AED]"
                   : isActive
-                  ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
-                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-[#7C3AED]/15 text-[#7C3AED]"
+                  : "text-[#6B7280] hover:bg-[#2A2A2A] hover:text-white"
               }`}
             >
               {isActive ? (
                 <span
-                  className={`absolute inset-x-5 top-1 h-1 rounded-full ${
-                    isPremiumItem ? "bg-violet-500/70" : "bg-emerald-500/70"
-                  }`}
+                  className="absolute inset-x-5 top-1 h-0.5 rounded-full bg-[#7C3AED]/70"
                 />
               ) : null}
 
@@ -94,11 +92,11 @@ function MobileBottomNavComponent() {
                 className={`flex h-8 w-8 items-center justify-center rounded-xl transition-all duration-300 ${
                   isPremiumItem
                     ? isActive
-                      ? "bg-violet-200 text-violet-700"
-                      : "text-violet-400 group-hover:bg-violet-100 group-hover:text-violet-700"
+                      ? "bg-[#7C3AED]/20 text-[#7C3AED]"
+                      : "text-[#7C3AED]/60 group-hover:bg-[#7C3AED]/10 group-hover:text-[#7C3AED]"
                     : isActive
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-900"
+                    ? "bg-[#7C3AED]/20 text-[#7C3AED]"
+                    : "text-[#6B7280] group-hover:bg-[#2A2A2A] group-hover:text-white"
                 }`}
               >
                 <Icon className="h-4 w-4" />

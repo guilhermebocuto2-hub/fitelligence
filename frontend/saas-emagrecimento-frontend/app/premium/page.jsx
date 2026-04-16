@@ -298,7 +298,7 @@ export default function PremiumPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-slate-50 to-violet-50/40 text-slate-900 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 dark:text-white">
+    <div className="min-h-screen bg-[#0F0F0F] text-white">
       <motion.div
         className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10"
         variants={staggerContainer}

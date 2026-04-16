@@ -12,7 +12,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Crown, ArrowRight } from "lucide-react";
+import { Crown, ArrowRight, LogOut } from "lucide-react";
 import PremiumCard from "../../../src/components/ui/PremiumCard";
 import SectionHeader from "../../../src/components/ui/SectionHeader";
 import { useAuth } from "../../../src/context/AuthContext";
@@ -70,7 +70,7 @@ export default function PerfilPage() {
       <div className="mx-auto w-full max-w-3xl space-y-4">
         <SectionHeader
           title="Perfil"
-          subtitle="Dados principais da sua conta no Fitelligence."
+          description="Dados principais da sua conta no Fitelligence."
         />
 
         {/* Card de upgrade — visível apenas para usuários não-premium */}
@@ -107,29 +107,29 @@ export default function PerfilPage() {
               Exibicao somente leitura para evitar impacto
               de negocio nesta fase de simplificacao.
              ================================================= */}
-          <div className="grid gap-3 text-sm text-slate-700">
+          <div className="grid gap-3 text-sm">
             <div>
-              <p className="text-slate-500">Nome</p>
-              <p className="font-medium text-slate-900">
+              <p className="text-[#9CA3AF]">Nome</p>
+              <p className="font-medium text-white">
                 {user?.nome || "Não informado"}
               </p>
             </div>
 
             <div>
-              <p className="text-slate-500">E-mail</p>
-              <p className="font-medium text-slate-900">
+              <p className="text-[#9CA3AF]">E-mail</p>
+              <p className="font-medium text-white">
                 {user?.email || "Não informado"}
               </p>
             </div>
 
             <div>
-              <p className="text-slate-500">Plano</p>
-              <p className="font-medium text-slate-900">{user?.plano || "free"}</p>
+              <p className="text-[#9CA3AF]">Plano</p>
+              <p className="font-medium text-white">{user?.plano || "free"}</p>
             </div>
 
             <div>
-              <p className="text-slate-500">Status do onboarding</p>
-              <p className="font-medium text-slate-900">
+              <p className="text-[#9CA3AF]">Status do onboarding</p>
+              <p className="font-medium text-white">
                 {user?.onboarding_status || "não iniciado"}
               </p>
             </div>
@@ -139,29 +139,32 @@ export default function PerfilPage() {
         <PremiumCard className="space-y-4">
           <SectionHeader
             title="Conta"
-            subtitle="Ajustes importantes para privacidade e controle da sua conta."
+            description="Ajustes importantes para privacidade e controle da sua conta."
           />
 
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-sm font-semibold text-slate-900">Sessão</p>
-            <p className="mt-1 text-sm leading-6 text-slate-600">
+          {/* Sessão — logout */}
+          <div className="rounded-2xl border border-[#2A2A2A] bg-[#0F0F0F] p-4">
+            <p className="text-sm font-semibold text-white">Sessão</p>
+            <p className="mt-1 text-sm leading-6 text-[#9CA3AF]">
               Encerre seu acesso com segurança neste dispositivo.
             </p>
 
             <button
               type="button"
               onClick={handleLogout}
-              className="mt-3 inline-flex rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
+              className="mt-3 inline-flex items-center gap-2 rounded-2xl bg-[#EF4444] px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-600 active:scale-95"
             >
+              <LogOut className="h-4 w-4" />
               Sair da conta
             </button>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-sm font-semibold text-slate-900">
+          {/* Política de privacidade */}
+          <div className="rounded-2xl border border-[#2A2A2A] bg-[#0F0F0F] p-4">
+            <p className="text-sm font-semibold text-white">
               Política de privacidade
             </p>
-            <p className="mt-1 text-sm leading-6 text-slate-600">
+            <p className="mt-1 text-sm leading-6 text-[#9CA3AF]">
               Consulte como tratamos dados de uso, fotos e informações de bem-estar.
             </p>
 
@@ -170,32 +173,33 @@ export default function PerfilPage() {
                 href={privacyPolicyUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-3 inline-flex rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
+                className="mt-3 inline-flex rounded-2xl border border-[#2A2A2A] bg-[#1A1A1A] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#2A2A2A]"
               >
                 Abrir política de privacidade
               </Link>
             ) : (
-              <p className="mt-3 text-xs text-slate-500">
+              <p className="mt-3 text-xs text-[#9CA3AF]">
                 Política de privacidade disponível em breve.
               </p>
             )}
           </div>
 
-          <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4">
-            <p className="text-sm font-semibold text-rose-900">Excluir conta</p>
-            <p className="mt-1 text-sm leading-6 text-rose-800">
+          {/* Excluir conta */}
+          <div className="rounded-2xl border border-[#EF4444]/30 bg-[#EF4444]/5 p-4">
+            <p className="text-sm font-semibold text-[#EF4444]">Excluir conta</p>
+            <p className="mt-1 text-sm leading-6 text-[#9CA3AF]">
               Esta ação encerra seu acesso e remove sua conta do app de forma segura.
             </p>
 
             {actionError ? (
-              <p className="mt-3 text-sm text-rose-700">{actionError}</p>
+              <p className="mt-3 text-sm text-[#EF4444]">{actionError}</p>
             ) : null}
 
             <button
               type="button"
               disabled={deleting}
               onClick={handleDeleteAccount}
-              className="mt-3 inline-flex rounded-2xl bg-rose-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:opacity-70"
+              className="mt-3 inline-flex rounded-2xl border border-[#EF4444]/40 bg-[#EF4444]/10 px-4 py-3 text-sm font-semibold text-[#EF4444] transition hover:bg-[#EF4444]/20 disabled:opacity-70"
             >
               {deleting ? "Excluindo conta..." : "Excluir conta"}
             </button>

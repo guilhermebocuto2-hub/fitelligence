@@ -104,7 +104,7 @@ export default function CheckoutPage() {
       return {
         id: "anual",
         nome: "Plano Anual",
-        precoPrincipal: "R$ 299,90",
+        precoPrincipal: "R$ 209,90",
         precoSecundario: "/ano",
         descricao:
           "Melhor custo-benefício para quem quer evolução consistente ao longo do ano.",
@@ -181,7 +181,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-slate-50 to-violet-50/40 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
+    <div className="min-h-screen bg-[#0F0F0F]">
       <motion.div
         className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10"
         initial="hidden"
@@ -313,7 +313,7 @@ export default function CheckoutPage() {
 
                   <div className="text-right">
                     <p className="text-xl font-bold text-slate-900 dark:text-white">
-                      R$ 299,90
+                      R$ 209,90
                     </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
                       por ano

@@ -15,7 +15,7 @@ import MobileBottomNav from "./MobileBottomNav";
 
 export default function DashboardLayout({ children }) {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.08),_transparent_28%),linear-gradient(180deg,#f8fafc_0%,#eef2f7_100%)] text-slate-900">
+    <div className="min-h-screen overflow-x-hidden bg-[#0F0F0F] text-white">
       <div className="flex min-h-screen">
         <Sidebar />
 
