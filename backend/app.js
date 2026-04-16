@@ -42,7 +42,12 @@ const logCorsDebug = (...args) => isDevelopment && console.log("[CORS-DEBUG]", .
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
-  'https://fitelligence-production.up.railway.app'
+  'https://fitelligence-production.up.railway.app',
+  'https://fitelligence-git-main-guilhermebocuto2-hubs-projects.vercel.app',
+];
+
+const allowedOriginPatterns = [
+  /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/,
 ];
 
 const corsOptions = {
@@ -55,6 +60,10 @@ const corsOptions = {
   }
 
   if (allowedOrigins.includes(origin)) {
+    return callback(null, true);
+  }
+
+  if (allowedOriginPatterns.some((pattern) => pattern.test(origin))) {
     return callback(null, true);
   }
 
@@ -136,6 +145,7 @@ app.use('/stripe', stripeRoutes);
 app.use('/chat', chatRoutes);
 app.use('/debug', debugRoutes);
 app.use("/onboarding", onboardingRoutes);
+
 
 // ================= ERROR HANDLER =================
 app.use(errorMiddleware);
