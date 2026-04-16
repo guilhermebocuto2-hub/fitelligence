@@ -1,16 +1,16 @@
 "use client";
 
 // ======================================================
-// PÃ¡gina principal do onboarding
-// ResponsÃ¡vel por:
-// - validar autenticaÃ§Ã£o antes de buscar dados protegidos
+// Página principal do onboarding
+// Responsável por:
+// - validar autenticação antes de buscar dados protegidos
 // - carregar o estado atual do onboarding
-// - permitir seleÃ§Ã£o de perfil
+// - permitir seleção de perfil
 // - montar etapas dinamicamente com base no perfil
-// - renderizar campos dinÃ¢micos
-// - salvar respostas por seÃ§Ã£o
+// - renderizar campos dinâmicos
+// - salvar respostas por seção
 // - concluir o onboarding e redirecionar corretamente
-// - manter experiÃªncia premium com foco mobile-first
+// - manter experiência premium com foco mobile-first
 // ======================================================
 
 // ======================================================
@@ -19,9 +19,10 @@
 import { useEffect, useMemo, useState } from "react";
 
 // ======================================================
-// NavegaÃ§Ã£o do Next.js
+// Navegação do Next.js
 // ======================================================
 import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 
 //=======================================================
 // Use  Auth 
@@ -55,12 +56,14 @@ import {
 } from "../../src/services/onboardingService";
 
 // ======================================================
-// Helper de autenticaÃ§Ã£o
+// Helper de autenticação
 // ======================================================
 import { getAuthToken } from "../../src/lib/api";
 
+const ONBOARDING_DRAFT_STORAGE_KEY = "fitelligence_onboarding_draft";
+
 // ======================================================
-// Helper para formatar tÃ­tulos automaticamente
+// Helper para formatar títulos automaticamente
 // Exemplo: "dados-fisicos" -> "Dados Fisicos"
 // ======================================================
 function formatarTituloStep(stepId) {
@@ -86,6 +89,8 @@ export default function OnboardingPage() {
   const [processandoIA, setProcessandoIA] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [authMessage, setAuthMessage] = useState("");
+  const [stepFeedback, setStepFeedback] = useState("");
+  const [showStepSuccess, setShowStepSuccess] = useState(false);
 
   // ====================================================
   // Estados do fluxo
@@ -93,6 +98,160 @@ export default function OnboardingPage() {
   const [perfilSelecionado, setPerfilSelecionado] = useState("");
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [respostas, setRespostas] = useState({});
+  const [fieldErrors, setFieldErrors] = useState({});
+
+  // ====================================================
+  // Le um rascunho salvo localmente de forma defensiva.
+  // Se o JSON estiver corrompido, remove o dado invalido
+  // para evitar quebrar o fluxo do onboarding.
+  // ====================================================
+  function lerDraftOnboarding() {
+    if (typeof window === "undefined") {
+      return null;
+    }
+
+    try {
+      const draftBruto = window.localStorage.getItem(
+        ONBOARDING_DRAFT_STORAGE_KEY
+      );
+
+      if (!draftBruto) {
+        return null;
+      }
+
+      const draft = JSON.parse(draftBruto);
+
+      if (
+        !draft ||
+        typeof draft !== "object" ||
+        typeof draft.currentStepIndex !== "number" ||
+        typeof draft.respostas !== "object" ||
+        draft.respostas === null
+      ) {
+        window.localStorage.removeItem(ONBOARDING_DRAFT_STORAGE_KEY);
+        return null;
+      }
+
+      console.log("Draft restaurado");
+      return draft;
+    } catch (error) {
+      console.error("Erro ao ler draft do onboarding:", error);
+      window.localStorage.removeItem(ONBOARDING_DRAFT_STORAGE_KEY);
+      return null;
+    }
+  }
+
+  // ====================================================
+  // Salva o rascunho local do onboarding para permitir
+  // retomada segura apos refresh ou retorno a pagina.
+  // ====================================================
+  function salvarDraftOnboarding(draft) {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(
+        ONBOARDING_DRAFT_STORAGE_KEY,
+        JSON.stringify(draft)
+      );
+      console.log("Draft salvo");
+    } catch (error) {
+      console.error("Erro ao salvar draft do onboarding:", error);
+    }
+  }
+
+  // ====================================================
+  // Remove o rascunho local quando o fluxo termina com
+  // sucesso ou quando precisamos descartar estado antigo.
+  // ====================================================
+  function limparDraftOnboarding() {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.removeItem(ONBOARDING_DRAFT_STORAGE_KEY);
+    console.log("Draft removido ao concluir");
+  }
+
+  // ====================================================
+  // Regras centralizadas para campos numéricos sensíveis
+  // Mantém a validação amigável no frontend sem alterar
+  // o contrato atual com o backend.
+  // ====================================================
+  const numericFieldRules = {
+    idade: {
+      min: 13,
+      max: 100,
+      message: "Informe uma idade entre 13 e 100 anos",
+    },
+    altura: {
+      min: 120,
+      max: 250,
+      message: "Informe uma altura entre 120 e 250 cm",
+    },
+    peso: {
+      min: 30,
+      max: 300,
+      message: "Informe um peso entre 30 e 300 kg",
+    },
+  };
+
+  // ====================================================
+  // Valida um campo numérico específico quando aplicável.
+  // Retorna mensagem de erro ou string vazia.
+  // ====================================================
+  function validarCampoNumerico(nomeCampo, valor) {
+    const regra = numericFieldRules[nomeCampo];
+
+    if (!regra) {
+      return "";
+    }
+
+    if (valor === "" || valor === null || valor === undefined) {
+      return "";
+    }
+
+    const valorNormalizado = String(valor).trim();
+
+    if (!valorNormalizado) {
+      return "";
+    }
+
+    const numero = Number(valorNormalizado);
+
+    if (!Number.isFinite(numero) || numero < regra.min || numero > regra.max) {
+      return regra.message;
+    }
+
+    return "";
+  }
+
+  // ====================================================
+  // Atualiza o mapa de erros por campo sem afetar os demais.
+  // ====================================================
+  function atualizarErroDoCampo(nomeCampo, mensagem) {
+    setFieldErrors((estadoAnterior) => {
+      const proximoEstado = { ...estadoAnterior };
+
+      if (mensagem) {
+        proximoEstado[nomeCampo] = mensagem;
+      } else {
+        delete proximoEstado[nomeCampo];
+      }
+
+      return proximoEstado;
+    });
+  }
+
+  // ====================================================
+  // Valida o campo ao perder foco para UX mais amigável.
+  // ====================================================
+  function handleBlurCampo(nomeCampo) {
+    const valorAtual = dadosDaSecaoAtual?.[nomeCampo];
+    const mensagem = validarCampoNumerico(nomeCampo, valorAtual);
+    atualizarErroDoCampo(nomeCampo, mensagem);
+  }
 
   // ====================================================
   // Normaliza a resposta do backend
@@ -132,8 +291,8 @@ export default function OnboardingPage() {
       0;
 
     // ==================================================
-    // Alguns backends usam etapa comeÃ§ando em 1
-    // No frontend usamos Ã­ndice comeÃ§ando em 0
+    // Alguns backends usam etapa começando em 1
+    // No frontend usamos índice começando em 0
     // ==================================================
     const etapaAtual =
       typeof etapaAtualBruta === "number" && etapaAtualBruta > 0
@@ -151,7 +310,7 @@ export default function OnboardingPage() {
   }
 
   // ====================================================
-  // Monta as seÃ§Ãµes reais com base no perfil selecionado
+  // Monta as seções reais com base no perfil selecionado
   // ====================================================
   const secoesDoPerfil = useMemo(() => {
     if (!perfilSelecionado) {
@@ -177,12 +336,12 @@ export default function OnboardingPage() {
   }, [perfilSelecionado]);
 
   // ====================================================
-  // SeÃ§Ã£o atual do fluxo
+  // Seção atual do fluxo
   // ====================================================
   const secaoAtual = secoesDoPerfil[currentStepIndex] || null;
 
   // ====================================================
-  // Chave da seÃ§Ã£o atual
+  // Chave da seção atual
   // ====================================================
   const chaveSecaoAtual =
     secaoAtual?.id ||
@@ -193,12 +352,44 @@ export default function OnboardingPage() {
     `secao_${currentStepIndex}`;
 
   // ====================================================
-  // Dados preenchidos na seÃ§Ã£o atual
+  // Dados preenchidos na seção atual
   // ====================================================
   const dadosDaSecaoAtual = respostas?.[chaveSecaoAtual] || {};
 
   // ====================================================
-  // Campos normalizados da seÃ§Ã£o atual
+  // Copy curta de reforco para deixar a jornada mais
+  // envolvente sem perder o tom premium.
+  // ====================================================
+  function obterMensagemDeAvanco(proximoIndice) {
+    const totalEtapas = secoesDoPerfil.length > 0 ? secoesDoPerfil.length : 1;
+    const progresso = ((proximoIndice + 1) / totalEtapas) * 100;
+
+    if (progresso >= 85) {
+      return "Estamos finalizando sua experiência";
+    }
+
+    if (progresso >= 60) {
+      return "Excelente, falta pouco";
+    }
+
+    if (progresso >= 35) {
+      return "Perfeito, estamos personalizando seu plano";
+    }
+
+    return "Boa, vamos para a próxima etapa";
+  }
+
+  // ====================================================
+  // Exibe um microfeedback visual curto apos salvar a
+  // etapa com sucesso, sem interromper o fluxo.
+  // ====================================================
+  function ativarFeedbackDeEtapa(proximoIndice) {
+    setStepFeedback(obterMensagemDeAvanco(proximoIndice));
+    setShowStepSuccess(true);
+  }
+
+  // ====================================================
+  // Campos normalizados da seção atual
   // ====================================================
   const camposDaSecaoAtual = useMemo(() => {
     if (!secaoAtual) {
@@ -233,6 +424,45 @@ export default function OnboardingPage() {
   }, []);
 
   // ====================================================
+  // Auto-save local do onboarding:
+  // persiste perfil, etapa atual e respostas sempre que
+  // o usuario avanca ou altera o preenchimento.
+  // Evitamos salvar drafts sem respostas reais para nao
+  // persistir estado incompleto desnecessariamente.
+  // ====================================================
+  useEffect(() => {
+    if (!perfilSelecionado) {
+      return;
+    }
+
+    if (!respostas || Object.keys(respostas).length === 0) {
+      return;
+    }
+
+    salvarDraftOnboarding({
+      perfilSelecionado,
+      currentStepIndex,
+      respostas,
+    });
+  }, [perfilSelecionado, currentStepIndex, respostas]);
+
+  // ====================================================
+  // Remove automaticamente o microfeedback para manter
+  // a interface limpa e discreta.
+  // ====================================================
+  useEffect(() => {
+    if (!showStepSuccess) {
+      return undefined;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setShowStepSuccess(false);
+    }, 1800);
+
+    return () => window.clearTimeout(timeout);
+  }, [showStepSuccess]);
+
+  // ====================================================
   // Busca o estado atual do onboarding
   // ====================================================
   async function carregarOnboarding() {
@@ -252,8 +482,15 @@ export default function OnboardingPage() {
 
       const data = await buscarOnboardingService();
       const onboardingNormalizado = normalizarRespostaOnboarding(data);
-
-      setRespostas(onboardingNormalizado.respostasSalvas || {});
+      const draftLocal = lerDraftOnboarding();
+      const respostasRemotas = onboardingNormalizado.respostasSalvas || {};
+      const temRespostasRemotas = Object.keys(respostasRemotas).length > 0;
+      const temDraftLocal =
+        draftLocal &&
+        draftLocal.perfilSelecionado &&
+        typeof draftLocal.currentStepIndex === "number" &&
+        draftLocal.respostas &&
+        Object.keys(draftLocal.respostas).length > 0;
 
       const deveRedirecionar =
         onboardingNormalizado.concluido === true;
@@ -268,17 +505,16 @@ export default function OnboardingPage() {
           onboardingNormalizado.redirecionarPara ||
           obterDestinoDashboardPorPerfil(onboardingNormalizado.perfil);
 
+        limparDraftOnboarding();
         router.replace(destinoConcluido);
         return;
       }
 
       // ==================================================
-      // SÃ³ continua automaticamente se houver progresso
+      // Só continua automaticamente se houver progresso
       // real salvo no onboarding
       // ==================================================
-      const temRespostasSalvas =
-        onboardingNormalizado.respostasSalvas &&
-        Object.keys(onboardingNormalizado.respostasSalvas).length > 0;
+      const temRespostasSalvas = temRespostasRemotas;
 
       const temEtapaSalva =
         typeof onboardingNormalizado.etapaAtual === "number" &&
@@ -293,8 +529,13 @@ export default function OnboardingPage() {
         // Mesmo que o backend legado retorne perfil antigo,
         // o frontend opera somente com "usuario".
         // ==================================================
+        setRespostas(respostasRemotas);
         setPerfilSelecionado("usuario");
         setCurrentStepIndex(onboardingNormalizado.etapaAtual);
+      } else if (temDraftLocal) {
+        setRespostas(draftLocal.respostas || {});
+        setPerfilSelecionado(draftLocal.perfilSelecionado || "usuario");
+        setCurrentStepIndex(draftLocal.currentStepIndex || 0);
       } else {
         // ==================================================
         // Fluxo unico:
@@ -305,6 +546,15 @@ export default function OnboardingPage() {
       }
     } catch (error) {
       console.error("Erro ao carregar onboarding:", error);
+      const draftLocal = lerDraftOnboarding();
+
+      if (draftLocal) {
+        setRespostas(draftLocal.respostas || {});
+        setPerfilSelecionado(draftLocal.perfilSelecionado || "usuario");
+        setCurrentStepIndex(draftLocal.currentStepIndex || 0);
+        setErrorMessage("");
+        return;
+      }
 
       if (error?.status === 401 || error?.status === 403) {
         setAuthMessage(
@@ -358,9 +608,11 @@ export default function OnboardingPage() {
   }
 
   // ====================================================
-  // Atualiza o valor de um campo da seÃ§Ã£o atual
+  // Atualiza o valor de um campo da seção atual
   // ====================================================
   function handleChangeCampo(nomeCampo, valor) {
+    const mensagemDeErro = validarCampoNumerico(nomeCampo, valor);
+
     setRespostas((estadoAnterior) => ({
       ...estadoAnterior,
       [chaveSecaoAtual]: {
@@ -368,29 +620,56 @@ export default function OnboardingPage() {
         [nomeCampo]: valor,
       },
     }));
+
+    if (!mensagemDeErro) {
+      atualizarErroDoCampo(nomeCampo, "");
+    }
   }
 
   // ====================================================
-  // ValidaÃ§Ã£o simples dos campos obrigatÃ³rios
+  // Validação simples dos campos obrigatórios
   // ====================================================
   function validarSecaoAtual() {
+    const errosNumericosDaSecao = {};
+
     for (const campo of camposDaSecaoAtual) {
+      const valor = dadosDaSecaoAtual?.[campo.name];
+
+      const erroNumerico = validarCampoNumerico(campo.name, valor);
+
+      if (erroNumerico) {
+        errosNumericosDaSecao[campo.name] = erroNumerico;
+      }
+
       if (!campo.required) {
         continue;
       }
 
-      const valor = dadosDaSecaoAtual?.[campo.name];
-
       if (valor === undefined || valor === null || valor === "") {
+        setFieldErrors((estadoAnterior) => ({
+          ...estadoAnterior,
+          ...errosNumericosDaSecao,
+        }));
         return `Preencha o campo obrigatório: ${campo.label}`;
       }
+    }
+
+    setFieldErrors((estadoAnterior) => ({
+      ...estadoAnterior,
+      ...errosNumericosDaSecao,
+    }));
+
+    const primeiraMensagemNumerica = Object.values(errosNumericosDaSecao)[0];
+
+    if (primeiraMensagemNumerica) {
+      return primeiraMensagemNumerica;
     }
 
     return "";
   }
 
   // ====================================================
-  // Salva a etapa atual e avanÃ§a
+  // Salva a etapa atual e avança
   // ====================================================
   async function handleSalvarEContinuar() {
     try {
@@ -412,6 +691,9 @@ export default function OnboardingPage() {
       });
 
       const ultimoPasso = currentStepIndex >= secoesDoPerfil.length - 1;
+      ativarFeedbackDeEtapa(
+        ultimoPasso ? currentStepIndex : currentStepIndex + 1
+      );
 
       if (!ultimoPasso) {
         setCurrentStepIndex((valorAtual) => valorAtual + 1);
@@ -426,30 +708,44 @@ export default function OnboardingPage() {
 
       await new Promise((resolve) => setTimeout(resolve, 1800));
 
-      const respostaConclusao = await concluirOnboardingService(
-        perfilSelecionado
-      );
+        const respostaConclusao = await concluirOnboardingService(
+          perfilSelecionado
+        );
+        limparDraftOnboarding();
 
-      // ==================================================
-      // Apos concluir onboarding, atualiza o usuario no
-      // AuthContext para refletir onboarding_status e
-      // tipo_usuario ja materializados na tabela usuarios.
-      // ==================================================
-      const usuarioAtualizado = await refreshUser();
+        // ==================================================
+        // Apos concluir onboarding, tentamos atualizar o
+        // usuario no AuthContext para refletir o estado
+        // mais recente. Se esse refresh falhar por motivo
+        // transitorio, nao bloqueamos o redirecionamento,
+        // porque a conclusao ja foi persistida no backend.
+        // ==================================================
+        let usuarioAtualizado = null;
 
-      // ==================================================
-      // Redirecionamento robusto:
-      // 1) rota vinda da API de conclusao
-      // 2) rota calculada pelo usuario atualizado no contexto
-      // 3) fallback pelo perfil selecionado no onboarding
-      // ==================================================
-      const destino =
-        respostaConclusao?.redirecionar_para ||
-        respostaConclusao?.onboarding?.redirecionar_para ||
-        obterDestinoDashboardPorPerfil(usuarioAtualizado?.tipo_usuario) ||
-        obterDestinoDashboardPorPerfil(perfilSelecionado);
+        try {
+          usuarioAtualizado = await refreshUser();
+        } catch (refreshError) {
+          console.error(
+            "Erro ao atualizar sessao apos concluir onboarding:",
+            refreshError
+          );
+        }
 
-      router.replace(destino);
+        // ==================================================
+        // Redirecionamento robusto:
+        // 1) rota vinda da API de conclusao
+        // 2) rota calculada pelo usuario atualizado no contexto
+        // 3) fallback pelo perfil selecionado no onboarding
+        // 4) fallback final estavel para /dashboard
+        // ==================================================
+        const destino =
+          respostaConclusao?.redirecionar_para ||
+          respostaConclusao?.onboarding?.redirecionar_para ||
+          obterDestinoDashboardPorPerfil(usuarioAtualizado?.tipo_usuario) ||
+          obterDestinoDashboardPorPerfil(perfilSelecionado) ||
+          "/dashboard";
+
+        router.replace(destino);
     } catch (error) {
       console.error("Erro ao salvar etapa:", error);
 
@@ -485,7 +781,7 @@ export default function OnboardingPage() {
 
   // ====================================================
   // Tela de processamento com IA
-  // Mantida simples, elegante e confortÃ¡vel para mobile
+  // Mantida simples, elegante e confortável para mobile
   // ====================================================
   if (processandoIA) {
     return (
@@ -513,9 +809,9 @@ export default function OnboardingPage() {
           </div>
 
           <div className="space-y-2 text-sm text-slate-400">
-            <p>✔️ Analisando seu contexto atual</p>
-            <p>✔️ Organizando prioridades iniciais</p>
-            <p>✔️ Preparando seu dashboard inteligente</p>
+            <p>OK Analisando seu contexto atual</p>
+            <p>OK Organizando prioridades iniciais</p>
+            <p>OK Preparando seu dashboard inteligente</p>
           </div>
         </div>
       </OnboardingShell>
@@ -552,7 +848,7 @@ export default function OnboardingPage() {
   }
 
   // ====================================================
-  // SessÃ£o ausente ou invÃ¡lida
+  // Sessão ausente ou inválida
   // ====================================================
   if (authMessage) {
     return (
@@ -675,7 +971,7 @@ export default function OnboardingPage() {
   }
 
   // ====================================================
-  // Caso o perfil nÃ£o tenha seÃ§Ãµes configuradas
+  // Caso o perfil não tenha seções configuradas
   // ====================================================
   if (!secaoAtual) {
     return (
@@ -711,17 +1007,19 @@ export default function OnboardingPage() {
     <OnboardingShell>
       <div className="space-y-6">
         {/* ===============================================
-            CabeÃ§alho da etapa
+            Cabeçalho da etapa
            =============================================== */}
-        <div className="space-y-4">
+        <motion.div
+          key={`step-header-${currentStepIndex}`}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.28, ease: "easeOut" }}
+          className="space-y-4"
+        >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="inline-flex w-fit rounded-full border border-violet-400/30 bg-violet-500/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-violet-200 sm:text-xs">
               Perfil: {perfilSelecionado}
             </div>
-
-            <span className="text-xs font-medium text-slate-300">
-              Etapa {currentStepIndex + 1} de {secoesDoPerfil.length}
-            </span>
           </div>
 
           <OnboardingProgress
@@ -743,12 +1041,36 @@ export default function OnboardingPage() {
                 "Preencha os dados abaixo para personalizar sua experiência."}
             </p>
           </div>
-        </div>
+        </motion.div>
+
+        <AnimatePresence mode="wait">
+          {showStepSuccess ? (
+            <motion.div
+              key={`step-feedback-${currentStepIndex}-${stepFeedback}`}
+              initial={{ opacity: 0, y: -8, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              transition={{ duration: 0.24, ease: "easeOut" }}
+              className="flex items-center gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100"
+            >
+              <span className="flex h-6 w-6 items-center justify-center rounded-full border border-emerald-300/40 bg-emerald-400/15 text-xs font-semibold text-emerald-200">
+                OK
+              </span>
+              <span className="font-medium">{stepFeedback}</span>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
 
         {/* ===============================================
             Campos da etapa
            =============================================== */}
-        <div className="grid gap-4">
+        <motion.div
+          key={`step-fields-${chaveSecaoAtual}-${currentStepIndex}`}
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.32, ease: "easeOut" }}
+          className="grid gap-4"
+        >
           {camposDaSecaoAtual.map((campo) => (
             <div key={campo.id || campo.name} className="space-y-2">
               <label className="text-sm font-medium text-slate-100">
@@ -761,13 +1083,21 @@ export default function OnboardingPage() {
               <OnboardingFieldRenderer
                 campo={campo}
                 valor={dadosDaSecaoAtual?.[campo.name] ?? ""}
+                error={fieldErrors?.[campo.name] || ""}
+                onBlur={() => handleBlurCampo(campo.name)}
                 onChange={(novoValor) =>
                   handleChangeCampo(campo.name, novoValor)
                 }
               />
+
+              {fieldErrors?.[campo.name] ? (
+                <p className="text-xs font-medium text-rose-300">
+                  {fieldErrors[campo.name]}
+                </p>
+              ) : null}
             </div>
           ))}
-        </div>
+        </motion.div>
 
         {/* ===============================================
             Mensagem de erro
@@ -779,7 +1109,7 @@ export default function OnboardingPage() {
         ) : null}
 
         {/* ===============================================
-            AÃ§Ãµes principais
+            Ações principais
             Mobile-first:
             - no celular ficam empilhadas
             - em telas maiores ficam lado a lado

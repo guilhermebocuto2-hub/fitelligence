@@ -12,6 +12,8 @@
 export default function OnboardingFieldRenderer({
   campo,
   valor,
+  error = "",
+  onBlur,
   onChange,
 }) {
   // ====================================================
@@ -41,6 +43,12 @@ export default function OnboardingFieldRenderer({
   // evitando warnings de controlled/uncontrolled component
   // ====================================================
   const valorControlado = valor ?? "";
+  const hasError = Boolean(error);
+  const fieldClassName = `h-14 w-full rounded-3xl border bg-white/10 px-4 text-sm text-white outline-none backdrop-blur-xl transition placeholder:text-slate-400 disabled:cursor-not-allowed disabled:opacity-60 ${
+    hasError
+      ? "border-rose-400 bg-rose-500/10 focus:border-rose-300 focus:bg-rose-500/10"
+      : "border-white/10 focus:border-violet-400 focus:bg-white/15"
+  }`;
 
   // ====================================================
   // Normaliza estrutura das opções para select / radio
@@ -73,8 +81,9 @@ export default function OnboardingFieldRenderer({
         <select
           value={valorControlado}
           onChange={(event) => onChange(event.target.value)}
+          onBlur={onBlur}
           disabled={disabled}
-          className="h-14 w-full rounded-3xl border border-white/10 bg-white/10 px-4 text-sm text-white outline-none backdrop-blur-xl transition focus:border-violet-400 focus:bg-white/15 disabled:cursor-not-allowed disabled:opacity-60"
+          className={fieldClassName}
         >
           <option value="" className="text-slate-900">
             Selecione
@@ -166,10 +175,15 @@ export default function OnboardingFieldRenderer({
       <textarea
         value={valorControlado}
         onChange={(event) => onChange(event.target.value)}
+        onBlur={onBlur}
         placeholder={placeholder}
         rows={campo.rows || 5}
         disabled={disabled}
-        className="w-full rounded-3xl border border-white/10 bg-white/10 px-4 py-4 text-sm text-white outline-none backdrop-blur-xl transition placeholder:text-slate-400 focus:border-violet-400 focus:bg-white/15 disabled:cursor-not-allowed disabled:opacity-60"
+        className={`w-full rounded-3xl border bg-white/10 px-4 py-4 text-sm text-white outline-none backdrop-blur-xl transition placeholder:text-slate-400 disabled:cursor-not-allowed disabled:opacity-60 ${
+          hasError
+            ? "border-rose-400 bg-rose-500/10 focus:border-rose-300 focus:bg-rose-500/10"
+            : "border-white/10 focus:border-violet-400 focus:bg-white/15"
+        }`}
       />
     );
   }
@@ -184,13 +198,14 @@ export default function OnboardingFieldRenderer({
         type="number"
         value={valorControlado}
         onChange={(event) => onChange(event.target.value)}
+        onBlur={onBlur}
         placeholder={placeholder}
         disabled={disabled}
         inputMode={inputMode || "decimal"}
         min={min}
         max={max}
         step={step}
-        className="h-14 w-full rounded-3xl border border-white/10 bg-white/10 px-4 text-sm text-white outline-none backdrop-blur-xl transition placeholder:text-slate-400 focus:border-violet-400 focus:bg-white/15 disabled:cursor-not-allowed disabled:opacity-60"
+        className={fieldClassName}
       />
     );
   }
@@ -205,10 +220,11 @@ export default function OnboardingFieldRenderer({
         type="email"
         value={valorControlado}
         onChange={(event) => onChange(event.target.value)}
+        onBlur={onBlur}
         placeholder={placeholder}
         disabled={disabled}
         inputMode="email"
-        className="h-14 w-full rounded-3xl border border-white/10 bg-white/10 px-4 text-sm text-white outline-none backdrop-blur-xl transition placeholder:text-slate-400 focus:border-violet-400 focus:bg-white/15 disabled:cursor-not-allowed disabled:opacity-60"
+        className={fieldClassName}
       />
     );
   }
@@ -222,9 +238,10 @@ export default function OnboardingFieldRenderer({
       type="text"
       value={valorControlado}
       onChange={(event) => onChange(event.target.value)}
+      onBlur={onBlur}
       placeholder={placeholder}
       disabled={disabled}
-      className="h-14 w-full rounded-3xl border border-white/10 bg-white/10 px-4 text-sm text-white outline-none backdrop-blur-xl transition placeholder:text-slate-400 focus:border-violet-400 focus:bg-white/15 disabled:cursor-not-allowed disabled:opacity-60"
+      className={fieldClassName}
     />
   );
 }

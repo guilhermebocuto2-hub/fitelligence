@@ -40,12 +40,38 @@ export default function DailyPlanCard({
   const treino = toObject(planoSeguro.treino);
   const alimentacao = toObject(planoSeguro.alimentacao);
   const habitos = toObject(planoSeguro.habitos);
-  const acaoPrincipal = toObject(planoSeguro.acao_principal);
+  const acaoPrincipal = toObject(
+    dashboardSeguro.acao_principal_do_dia || planoSeguro.acao_principal
+  );
   const execution = toObject(dashboardSeguro.execucao_plano_do_dia);
+  const resumoExecucao = toObject(dashboardSeguro.resumo_execucao_diaria);
   const motivacao = toObject(dashboardSeguro.motivacao_do_dia);
   const usuario = toObject(dashboardSeguro.usuario);
   const scoreDia = toNumber(dashboardSeguro.score_dia, 0);
   const streakDias = toNumber(dashboardSeguro.streak_dias, 0);
+  const metaCalorica = toNumber(
+    dashboardSeguro.meta_calorica,
+    toNumber(alimentacao.calorias, 0)
+  );
+  const metaAgua = toNumber(
+    dashboardSeguro.meta_agua,
+    toNumber(habitos.agua_ml, 0)
+  );
+  const metaPassos = toNumber(
+    dashboardSeguro.meta_passos,
+    toNumber(habitos.passos, 0)
+  );
+  const aguaHoje = toNumber(
+    resumoExecucao.agua_hoje,
+    toNumber(execution.agua_consumida_ml, 0)
+  );
+  const passosHoje = toNumber(
+    resumoExecucao.passos_hoje,
+    toNumber(execution.passos_realizados, 0)
+  );
+  const checkinHoje = Boolean(
+    resumoExecucao.checkin_realizado_hoje ?? execution.checkin_realizado
+  );
   const refeicoes = Array.isArray(alimentacao.refeicoes)
     ? alimentacao.refeicoes
     : [];
@@ -192,7 +218,7 @@ export default function DailyPlanCard({
             {treino.titulo || "Plano leve do dia"}
           </p>
           <p className="mt-1 text-sm text-slate-600">
-            {toNumber(treino.duracao_min, 0) || "--"} min •{" "}
+            {toNumber(treino.duracao_min, 0) || "--"} min ââ‚¬Â¢{" "}
             {treino.intensidade || "--"}
           </p>
           <p className="mt-2 text-sm font-medium text-slate-700">
@@ -206,12 +232,12 @@ export default function DailyPlanCard({
             <p className="text-sm font-semibold">Calorias alvo</p>
           </div>
           <p className="mt-2 text-lg font-bold text-slate-900">
-            {toNumber(alimentacao.calorias, 0)} kcal
+            {metaCalorica} kcal
           </p>
           <p className="mt-1 text-sm text-slate-600">
             {refeicoes.length > 0
               ? `${refeicoes.length} refeicoes planejadas`
-              : "Distribuicao basica do dia"}
+              : "Meta calorica definida a partir do seu onboarding"}
           </p>
         </div>
 
@@ -221,14 +247,14 @@ export default function DailyPlanCard({
             <p className="text-sm font-semibold">Agua</p>
           </div>
           <p className="mt-2 text-lg font-bold text-slate-900">
-            {toNumber(habitos.agua_ml, 0)} ml
+            {aguaHoje} / {metaAgua || "--"} ml
           </p>
           <p className="mt-1 text-sm text-slate-600">
-            {toNumber(habitos.passos, 0)} passos • {habitos.sono_horas || "--"}{" "}
+            {toNumber(habitos.passos, 0)} passos ââ‚¬Â¢ {habitos.sono_horas || "--"}{" "}
             h sono
           </p>
           <p className="mt-2 text-sm font-medium text-slate-700">
-            {toNumber(execution.agua_consumida_ml, 0)} ml registrados hoje
+            {checkinHoje ? "Check-in do dia realizado" : "Check-in do dia pendente"}
           </p>
         </div>
 
@@ -242,7 +268,7 @@ export default function DailyPlanCard({
           </p>
           <p className="mt-1 text-sm text-slate-600">
             {acaoPrincipal.descricao ||
-              "Use este bloco como guia operacional do seu dia."}
+              "Use este bloco como guia operacional do seu dia com base no estado atual."}
           </p>
         </div>
       </div>
