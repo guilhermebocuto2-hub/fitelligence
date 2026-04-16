@@ -1,12 +1,12 @@
 const onboardingService = require("../services/onboardingService");
 
 // ======================================================
-// Buscar onboarding completo do usuário autenticado
+// Buscar onboarding completo do usuÃ¡rio autenticado
 // ======================================================
 exports.buscarOnboarding = async (req, res) => {
   try {
     // ======================================================
-    // O authMiddleware salva o usuário autenticado em req.user
+    // O authMiddleware salva o usuÃ¡rio autenticado em req.user
     // ======================================================
     const usuarioId = req.user.id;
 
@@ -64,14 +64,14 @@ exports.iniciarOnboarding = async (req, res) => {
 exports.salvarEtapa = async (req, res) => {
   try {
     // ======================================================
-    // Logs temporários para debug
-    // Depois você pode remover
+    // Logs temporÃ¡rios para debug
+    // Depois vocÃª pode remover
     // ======================================================
     console.log("req.user:", req.user);
     console.log("req.body:", req.body);
 
     // ======================================================
-    // Validação defensiva para evitar quebra
+    // ValidaÃ§Ã£o defensiva para evitar quebra
     // ======================================================
     if (!req.user || !req.user.id) {
       return res.status(401).json({
@@ -85,9 +85,9 @@ exports.salvarEtapa = async (req, res) => {
     const { perfil_tipo, secao, etapa_atual, respostas } = req.body;
 
     // ======================================================
-    // Validação básica do payload
+    // ValidaÃ§Ã£o bÃ¡sica do payload
     // ======================================================
-    if (!secao || !etapa_atual || !respostas) {
+    if (!secao || etapa_atual === undefined || etapa_atual === null || !respostas) {
       return res.status(400).json({
         mensagem: "Dados obrigatórios não enviados",
         erro: "secao, etapa_atual e respostas são obrigatórios",
@@ -147,7 +147,7 @@ exports.concluirOnboarding = async (req, res) => {
 };
 
 // ======================================================
-// Atualizar uma etapa específica do onboarding
+// Atualizar uma etapa especÃ­fica do onboarding
 // ======================================================
 exports.atualizarEtapa = async (req, res) => {
   try {
@@ -174,3 +174,4 @@ exports.atualizarEtapa = async (req, res) => {
     });
   }
 };
+

@@ -44,6 +44,11 @@ const allowedOrigins = [
   'http://127.0.0.1:3000',
   'https://fitelligence-production.up.railway.app',
   'https://fitelligence-git-main-guilhermebocuto2-hubs-projects.vercel.app',
+  // Capacitor Android/iOS — origin enviada pelo webview nativo
+  'capacitor://localhost',
+  'ionic://localhost',
+  'http://localhost',
+  'https://localhost',
 ];
 
 const allowedOriginPatterns = [
