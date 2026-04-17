@@ -313,7 +313,7 @@ export default function PremiumPage() {
             <button
               type="button"
               onClick={handleGoToDashboard}
-              className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-700"
+              className="inline-flex items-center gap-2 rounded-2xl border border-[#2A2A2A] bg-[#1A1A1A] px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#2A2A2A] active:scale-[0.98]"
             >
               <ChevronLeft className="h-4 w-4" />
               Voltar ao dashboard
@@ -356,7 +356,7 @@ export default function PremiumPage() {
                     type="button"
                     onClick={() => handleUpgrade(selectedPlan)}
                     disabled={purchaseLoading}
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {purchaseLoading ? "Processando compra..." : "Desbloquear Premium"}
                     {!purchaseLoading ? <ArrowRight className="h-4 w-4" /> : null}
@@ -365,7 +365,7 @@ export default function PremiumPage() {
                   <button
                     type="button"
                     onClick={handleGoToDashboard}
-                    className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600"
+                    className="inline-flex items-center justify-center rounded-2xl border border-[#2A2A2A] bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#2A2A2A] active:scale-[0.98]"
                   >
                     Continuar no plano Free
                   </button>
@@ -754,7 +754,7 @@ export default function PremiumPage() {
                   type="button"
                   onClick={() => handleUpgrade(selectedPlan)}
                   disabled={purchaseLoading}
-                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
+                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {purchaseLoading ? "Processando compra..." : "Quero desbloquear o Premium"}
                   {!purchaseLoading ? <ArrowRight className="h-4 w-4" /> : null}
