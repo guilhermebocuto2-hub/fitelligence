@@ -65,7 +65,7 @@ const PLAN_OPTIONS = {
   monthly: {
     id: "monthly",
     title: "Plano mensal",
-    price: "R$ 19,90",
+    price: "R$ 29,90",
     period: "/mês",
     description: "Comece agora com flexibilidade mensal",
     badge: "",
@@ -79,7 +79,7 @@ const PLAN_OPTIONS = {
     period: "/ano",
     description: "Melhor custo-benefício para evolução contínua",
     badge: "Mais escolhido",
-    helper: "≈ R$ 9,99/mês · Economize ~50%",
+    helper: "≈ R$ 17,49/mês · Economize ~50%",
     highlighted: true,
   },
 };
