@@ -48,10 +48,11 @@ const enviarImagemCorporal = async (req, res) => {
       descricao: descricao || null,
     });
 
-    const analiseCorporal = analisarCorpo({
+    const analiseCorporal = await analisarCorpo({
       totalFotos: imagensCorporais.length + 1,
       possuiComparacao: Boolean(imagemAnterior),
       descricaoAtual: descricao || "",
+      filePath: arquivo.path,
     });
 
     const analiseSalva = await analiseCorporalModel.criar({
@@ -115,6 +116,7 @@ const enviarImagemRefeicao = async (req, res) => {
     const analise = await analisadorRefeicao.analisar({
       nomeArquivo: nome_arquivo,
       descricao: descricao || "",
+      filePath: arquivo.path,
     });
 
     const analiseSalva = await analiseRefeicaoModel.criar({
