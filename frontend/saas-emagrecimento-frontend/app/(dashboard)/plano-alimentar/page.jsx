@@ -55,11 +55,11 @@ function getStatusDoDia(percentual) {
   if (percentual >= 100) return "Meta diaria atingida. Mantenha escolhas equilibradas.";
   if (percentual >= 75) return "Dia bem encaminhado. Continue no mesmo ritmo.";
   if (percentual >= 40) return "Bom inicio de dia. Ainda ha espaco para evoluir.";
-  return "Comece registrando refeicoes para ativar insights mais precisos.";
+  return "Comece registrando refeições para ativar insights mais precisos.";
 }
 
 function CardRefeicao({ refeicao }) {
-  const titulo = refeicao?.descricao || "Refeicao sem descricao";
+  const titulo = refeicao?.descricao || "Refeição sem descricao";
   const classificacao = refeicao?.classificacao || "Sem classificacao";
   const calorias = toNumber(refeicao?.calorias_estimadas, 0);
   const proteinas = toNumber(refeicao?.proteinas, 0);
@@ -77,7 +77,7 @@ function CardRefeicao({ refeicao }) {
     >
       {/* Fallback visual de imagem para manter layout estável quando não houver foto */}
       <div className="mb-3 flex h-28 w-full items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-400">
-        {refeicao?.imagem_url ? "Imagem da refeicao" : "Sem imagem"}
+        {refeicao?.imagem_url ? "Imagem da refeição" : "Sem imagem"}
       </div>
 
       <h3 className="truncate text-sm font-semibold text-slate-900">{titulo}</h3>
@@ -121,7 +121,7 @@ export default function PlanoAlimentarPage() {
         setAnalisesIA(analisesResposta?.analises || []);
       } catch (error) {
         console.error("Erro ao carregar plano alimentar:", error);
-        setErro("Nao foi possivel carregar a area de alimentacao.");
+        setErro("Nao foi possivel carregar a area de alimentação.");
       } finally {
         setCarregando(false);
       }
@@ -192,7 +192,7 @@ export default function PlanoAlimentarPage() {
         resumoAlimentar?.texto,
         dashboard?.resumo_alimentar_inteligente?.recomendacao
       ) ||
-      "Continue registrando refeicoes para melhorar a precisao da analise."
+      "Continue registrando refeições para melhorar a precisao da análise."
     );
   }, [dashboard, resumoAlimentar]);
 
@@ -224,7 +224,7 @@ export default function PlanoAlimentarPage() {
       setFeedbackAcao("Foto enviada e analisada com sucesso.");
     } catch (error) {
       setFeedbackAcao(
-        error?.message || "Nao foi possivel analisar a refeicao agora."
+        error?.message || "Nao foi possivel analisar a refeição agora."
       );
     } finally {
       setUploadingIA(false);
@@ -250,7 +250,7 @@ export default function PlanoAlimentarPage() {
   if (erro) {
     return (
       <PremiumCard className="border-red-200 bg-red-50" interactive={false}>
-        <h1 className="text-lg font-semibold text-red-700">Erro na alimentacao</h1>
+        <h1 className="text-lg font-semibold text-red-700">Erro na alimentação</h1>
         <p className="mt-2 text-sm text-red-600">{erro}</p>
       </PremiumCard>
     );
@@ -259,7 +259,7 @@ export default function PlanoAlimentarPage() {
   return (
     <MobileLayout
       title="Plano"
-      subtitle="Sua alimentacao organizada para hoje"
+      subtitle="Sua alimentação organizada para hoje"
       scoreDia={dashboard?.score_dia ?? null}
       streakDias={dashboard?.streak_dias ?? null}
     >
@@ -272,7 +272,7 @@ export default function PlanoAlimentarPage() {
         <SectionHeader
           eyebrow="Alimentacao do dia"
           title="Resumo alimentar"
-          description="Leitura rapida para manter consistencia diaria sem poluicao visual."
+          description="Leitura rapida para manter consistência diaria sem poluição visual."
         />
 
         <div className="mt-5">
@@ -313,8 +313,8 @@ export default function PlanoAlimentarPage() {
       <PremiumCard>
         <SectionHeader
           eyebrow="IA por foto"
-          title="Analise visual da refeicao"
-          description="Upload rapido com leitura nutricional curta e proximo passo pratico."
+          title="Análise visual da refeição"
+          description="Upload rapido com leitura nutricional curta e próximo passo prático."
         />
 
         <input
@@ -330,13 +330,9 @@ export default function PlanoAlimentarPage() {
         <button
           type="button"
           onClick={() => inputRefeicaoRef.current?.click()}
-          className="
-            mt-4 inline-flex w-full items-center justify-center rounded-2xl
-            bg-slate-900 px-4 py-3 text-sm font-semibold text-white
-            transition-all duration-200 hover:bg-slate-800 active:scale-[0.98]
-          "
+          className="mt-4 inline-flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-4 py-4 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all duration-200 active:scale-[0.97]"
         >
-          {uploadingIA ? "Analisando refeicao..." : "Enviar foto da refeicao"}
+          {uploadingIA ? "Analisando refeição..." : "Enviar foto da refeição"}
         </button>
 
         {feedbackAcao ? (
@@ -346,7 +342,7 @@ export default function PlanoAlimentarPage() {
           // ==================================================
           <div className="mt-3 rounded-2xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50 via-white to-cyan-50 px-4 py-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
-              Proximo passo
+              Próximo passo
             </p>
             <p className="mt-1 text-sm leading-6 text-slate-700">{feedbackAcao}</p>
           </div>
@@ -355,14 +351,14 @@ export default function PlanoAlimentarPage() {
         {analisesIA[0] ? (
           <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
             <p className="text-sm font-semibold text-slate-900">
-              {analisesIA[0].classificacao || "Analise gerada"}
+              {analisesIA[0].classificacao || "Análise gerada"}
             </p>
             <p className="mt-1 text-sm text-slate-700">
               {analisesIA[0].observacoes ||
                 "Leitura nutricional concluida com sucesso."}
             </p>
             <p className="mt-2 text-sm text-emerald-800">
-              Proximo passo:{" "}
+              Próximo passo:{" "}
               {analisesIA[0].sugestao_proximo_passo ||
                 "Continue registrando para melhorar a leitura do dia."}
             </p>
@@ -379,7 +375,7 @@ export default function PlanoAlimentarPage() {
       <PremiumCard>
         <SectionHeader
           eyebrow="Timeline"
-          title="Refeicoes do dia"
+          title="Refeições do dia"
           description="Organizacao clara por periodo para facilitar acompanhamento diario."
         />
 
@@ -427,7 +423,7 @@ export default function PlanoAlimentarPage() {
         <SectionHeader
           eyebrow="Insight inteligente"
           title="Leitura de IA"
-          description="Resumo curto para orientar sua proxima decisao alimentar."
+          description="Resumo curto para orientar sua próxima decisao alimentar."
         />
         <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
           {/* TODO: insights avancados como feature premium */}
@@ -445,7 +441,7 @@ export default function PlanoAlimentarPage() {
         <SectionHeader
           eyebrow="Plano do dia"
           title="Orientacao nutricional"
-          description="Direcionamento simples para manter foco e consistencia."
+          description="Direcionamento simples para manter foco e consistência."
         />
 
         {dashboard?.ultimo_plano?.dieta ? (
