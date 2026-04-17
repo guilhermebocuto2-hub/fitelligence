@@ -418,7 +418,7 @@ export default function DailyHomeSummary({
         <button
           type="button"
           onClick={mainAction.onClick}
-          className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 text-sm font-semibold text-white transition hover:bg-slate-800 active:scale-[0.98]"
+          className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-4 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition active:scale-[0.98]"
         >
           {mainAction.cta}
           <ArrowRight className="h-4 w-4" />
