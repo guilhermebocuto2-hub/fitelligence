@@ -146,6 +146,7 @@ exports.criarCheckoutSession = async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: stripeCustomerId,
+      payment_method_types: ["card"],
 
       // ==================================================
       // Produto/preço escolhido com base no billingCycle
