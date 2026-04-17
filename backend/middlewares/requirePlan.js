@@ -1,44 +1,38 @@
-const assinaturaModel = require('../models/assinaturaModel');
+"use strict";
+
+// ======================================================
+// Middleware de verificação de plano
+// Responsável por:
+// - bloquear rotas premium para usuários free
+// - usar req.usuario.plano (já preenchido pelo authMiddleware)
+// - retornar 403 claro com plano atual e planos necessários
+//
+// Uso nas rotas (sempre após authMiddleware):
+//   router.get('/', authMiddleware, requirePlan(['premium']), controller)
+// ======================================================
 
 function requirePlan(planosPermitidos = []) {
-  return async (req, res, next) => {
-    try {
-      const usuarioId = req.user.id;
+  return (req, res, next) => {
+    // Se nenhum plano foi exigido, libera
+    if (!planosPermitidos.length) {
+      return next();
+    }
 
-      const assinatura = await assinaturaModel.buscarAssinaturaAtivaPorUsuario(usuarioId);
+    const planoAtual = String(req.usuario?.plano || "free").toLowerCase();
 
-      if (!assinatura) {
-        return res.status(403).json({
-          success: false,
-          message: 'Este recurso exige uma assinatura ativa'
-        });
-      }
-
-      if (
-        Array.isArray(planosPermitidos) &&
-        planosPermitidos.length > 0 &&
-        !planosPermitidos.includes(assinatura.plano_slug)
-      ) {
-        return res.status(403).json({
-          success: false,
-          message: 'Seu plano atual não permite acessar este recurso',
-          data: {
-            plano_atual: assinatura.plano_slug,
-            planos_permitidos: planosPermitidos
-          }
-        });
-      }
-
-      req.assinatura = assinatura;
-      next();
-    } catch (error) {
-      console.error('Erro no middleware requirePlan:', error);
-
-      return res.status(500).json({
+    if (!planosPermitidos.includes(planoAtual)) {
+      return res.status(403).json({
         success: false,
-        message: 'Erro interno ao validar assinatura'
+        message: "Seu plano atual não permite acessar este recurso.",
+        data: {
+          plano_atual: planoAtual,
+          planos_permitidos: planosPermitidos,
+          upgrade_url: "/premium",
+        },
       });
     }
+
+    return next();
   };
 }
 
