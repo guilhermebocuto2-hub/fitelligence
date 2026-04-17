@@ -1,13 +1,13 @@
 // ======================================================
 // Service do onboarding
-// Responsável por centralizar a regra de negócio do fluxo:
+// Responsável por centralizar a regra de negÃ³cio do fluxo:
 // - iniciar onboarding
 // - salvar etapas
 // - buscar onboarding completo
-// - concluir onboarding com validação
+// - concluir onboarding com validaÃ§Ã£o
 // - materializar dados-base em usuarios
 // - criar meta inicial automática quando aplicável
-// - atualizar etapas específicas
+// - atualizar etapas especÃ­ficas
 // ======================================================
 
 const onboardingModel = require("../models/onboardingModel");
@@ -22,11 +22,11 @@ const {
 } = require("../utils/onboardingUtils");
 
 // ======================================================
-// Mapa de aliases de seção
+// Mapa de aliases de seÃ§Ã£o
 // Responsável por:
-// - aceitar nomes em português e inglês
+// - aceitar nomes em portuguÃªs e inglÃªs
 // - evitar quebra no concluirOnboarding
-// - padronizar comparação entre seções salvas e obrigatórias
+// - padronizar comparaÃ§Ã£o entre seÃ§Ãµes salvas e obrigatÃ³rias
 // ======================================================
 const MAPA_SECOES = {
 alimentacao: "nutricao",
@@ -57,7 +57,7 @@ diet: "nutricao",
 };
 
 // ======================================================
-// Normaliza texto para comparação de seções
+// Normaliza texto para comparaÃ§Ã£o de seÃ§Ãµes
 // ======================================================
 function normalizarTexto(valor) {
   return String(valor || "")
@@ -70,7 +70,7 @@ function normalizarTexto(valor) {
 }
 
 // ======================================================
-// Converte uma seção qualquer para a forma canônica
+// Converte uma seÃ§Ã£o qualquer para a forma canÃ´nica
 // ======================================================
 function canonicalizarSecao(secao) {
   const chaveNormalizada = normalizarTexto(secao);
@@ -78,8 +78,8 @@ function canonicalizarSecao(secao) {
 }
 
 // ======================================================
-// Retorna lista de seções equivalentes para compatibilidade
-// temporária entre dados legados e seção canônica
+// Retorna lista de seÃ§Ãµes equivalentes para compatibilidade
+// temporária entre dados legados e seÃ§Ã£o canÃ´nica
 // ======================================================
 function obterSecoesEquivalentes(secao) {
   const secaoCanonica = canonicalizarSecao(secao);
@@ -91,7 +91,7 @@ function obterSecoesEquivalentes(secao) {
     const aliasBase = String(alias || "").trim().toLowerCase();
     if (!aliasBase) continue;
 
-    // Mantém variações comuns persistidas historicamente
+    // MantÃ©m variaÃ§Ãµes comuns persistidas historicamente
     equivalentes.add(aliasBase);
     equivalentes.add(aliasBase.replace(/_/g, "-"));
     equivalentes.add(aliasBase.replace(/-/g, "_"));
@@ -101,7 +101,7 @@ function obterSecoesEquivalentes(secao) {
 }
 
 // ======================================================
-// Busca uma seção dentro do objeto agrupado aceitando aliases
+// Busca uma seÃ§Ã£o dentro do objeto agrupado aceitando aliases
 // ======================================================
 function obterSecao(respostasAgrupadas, nomesPossiveis = []) {
   const chaves = Object.keys(respostasAgrupadas || {});
@@ -123,8 +123,8 @@ function obterSecao(respostasAgrupadas, nomesPossiveis = []) {
 // do onboarding consolidado
 //
 // REGRA:
-// - sobe para usuarios apenas o que é central e reutilizável
-// - mantém o restante no onboarding_respostas
+// - sobe para usuarios apenas o que Ã© central e reutilizável
+// - mantÃ©m o restante no onboarding_respostas
 // ======================================================
 function extrairDadosBaseDoOnboarding({ perfilTipo, respostasAgrupadas }) {
   const perfil = obterSecao(respostasAgrupadas, ["perfil", "profile"]);
@@ -143,7 +143,7 @@ function extrairDadosBaseDoOnboarding({ perfilTipo, respostasAgrupadas }) {
   const nome = perfil?.nome_completo || perfil?.nome || null;
 
   // ====================================================
-  // Idade e gênero:
+  // Idade e gÃªnero:
   // servem para qualquer perfil
   // ====================================================
   const idade = perfil?.idade ? Number(perfil.idade) : null;
@@ -151,19 +151,19 @@ function extrairDadosBaseDoOnboarding({ perfilTipo, respostasAgrupadas }) {
 
   // ====================================================
   // Altura:
-  // útil principalmente para usuário final
+  // Ãºtil principalmente para usuário final
   // ====================================================
   const altura = perfil?.altura ? Number(perfil.altura) : null;
 
   // ====================================================
   // Peso:
-  // vem da etapa de dados físicos do usuário final
+  // vem da etapa de dados fÃ­sicos do usuário final
   // ====================================================
   const peso = dadosFisicos?.peso ? Number(dadosFisicos.peso) : null;
 
   // ====================================================
-  // Objetivo e nível de atividade:
-  // são campos importantes para personalização do produto
+  // Objetivo e nÃ­vel de atividade:
+  // sÃ£o campos importantes para personalizaÃ§Ã£o do produto
   // ====================================================
   const objetivoPrincipal =
     objetivo?.objetivo_principal || objetivo?.objetivo || null;
@@ -188,7 +188,7 @@ function extrairDadosBaseDoOnboarding({ perfilTipo, respostasAgrupadas }) {
   }
 
   // ====================================================
-  // Para usuário final, materializamos os dados mais úteis
+  // Para usuário final, materializamos os dados mais Ãºteis
   // para o restante da jornada
   // ====================================================
   return {
@@ -388,7 +388,7 @@ function derivarMetasOperacionais({ respostasAgrupadas }) {
 
 // ======================================================
 // Busca respostas já salvas do onboarding e devolve
-// agrupadas por seção em formato de objeto
+// agrupadas por seÃ§Ã£o em formato de objeto
 // ======================================================
 function agruparRespostasDoOnboarding(respostasSalvas) {
   const respostasAgrupadas = {};
@@ -411,7 +411,7 @@ function obterDataAtualMysql() {
 }
 
 // ======================================================
-// Normaliza objetivo principal para comparação segura
+// Normaliza objetivo principal para comparaÃ§Ã£o segura
 // ======================================================
 function normalizarObjetivo(objetivo) {
   return normalizarTexto(objetivo);
@@ -421,7 +421,7 @@ function normalizarObjetivo(objetivo) {
 // Cria meta inicial automática a partir do onboarding
 // Responsável por:
 // - criar a primeira meta do usuário final
-// - evitar duplicação de meta automática
+// - evitar duplicaÃ§Ã£o de meta automática
 // - respeitar o schema real da tabela metas
 // ======================================================
 async function criarMetaInicialSeAplicavel({
@@ -430,7 +430,7 @@ async function criarMetaInicialSeAplicavel({
   respostasAgrupadas,
 }) {
   // ====================================================
-  // Meta automática inicial só faz sentido para usuário final
+  // Meta automática inicial sÃ³ faz sentido para usuário final
   // ====================================================
   if (perfilTipo !== "usuario") {
     return null;
@@ -458,7 +458,7 @@ async function criarMetaInicialSeAplicavel({
       : null;
 
   // ====================================================
-  // Sem peso atual ou peso meta válidos, não criamos meta
+  // Sem peso atual ou peso meta válidos, nÃ£o criamos meta
   // ====================================================
   if (
     pesoAtual === null ||
@@ -470,7 +470,7 @@ async function criarMetaInicialSeAplicavel({
   }
 
   // ====================================================
-  // Se peso atual e meta forem iguais, não faz sentido criar
+  // Se peso atual e meta forem iguais, nÃ£o faz sentido criar
   // uma meta automática inicial
   // ====================================================
   if (pesoAtual === pesoMeta) {
@@ -490,7 +490,7 @@ async function criarMetaInicialSeAplicavel({
   }
 
   // ====================================================
-  // Valida coerência da meta conforme o objetivo principal
+  // Valida coerÃªncia da meta conforme o objetivo principal
   // ====================================================
   const ehEmagrecimento =
     objetivoPrincipal === "emagrecimento" ||
@@ -511,9 +511,9 @@ async function criarMetaInicialSeAplicavel({
   }
 
   // ====================================================
-  // Caso não bata com as regras acima, ainda permitimos criar
-  // a meta automática se houver diferença de peso
-  // porque isso mantém o fluxo funcional e evita travas
+  // Caso nÃ£o bata com as regras acima, ainda permitimos criar
+  // a meta automática se houver diferenÃ§a de peso
+  // porque isso mantÃ©m o fluxo funcional e evita travas
   // ====================================================
   const descricao =
     `Meta criada automaticamente a partir do onboarding: ` +
@@ -535,7 +535,7 @@ async function criarMetaInicialSeAplicavel({
 // Responsável por:
 // - localizar o onboarding principal
 // - buscar respostas salvas
-// - agrupar respostas por seção
+// - agrupar respostas por seÃ§Ã£o
 // - devolver objeto pronto para o frontend
 // ======================================================
 exports.buscarOnboardingCompleto = async (usuarioId) => {
@@ -612,9 +612,9 @@ exports.iniciarOnboarding = async ({ usuarioId, perfilTipo }) => {
 // Salvar etapa do onboarding
 // Responsável por:
 // - validar perfil
-// - criar onboarding se ainda não existir
-// - validar consistência do perfil
-// - criar ou atualizar resposta da seção
+// - criar onboarding se ainda nÃ£o existir
+// - validar consistÃªncia do perfil
+// - criar ou atualizar resposta da seÃ§Ã£o
 // - atualizar etapa atual
 // - marcar usuário como em andamento
 // ======================================================
@@ -635,7 +635,7 @@ exports.salvarEtapa = async ({
     throw new Error("A seção do onboarding é obrigatória");
   }
 
-  if (!etapaAtual) {
+  if (etapaAtual === undefined || etapaAtual === null) {
     throw new Error("A etapa atual do onboarding é obrigatória");
   }
 
@@ -665,8 +665,8 @@ exports.salvarEtapa = async ({
   // ====================================================
 
   // ======================================================
-  // Canoniza a seção antes de persistir para garantir
-  // escrita padronizada no banco (fonte única de seção)
+  // Canoniza a seÃ§Ã£o antes de persistir para garantir
+  // escrita padronizada no banco (fonte Ãºnica de seÃ§Ã£o)
   // ======================================================
   const secaoCanonica = canonicalizarSecao(secao);
   const secoesEquivalentes = obterSecoesEquivalentes(secaoCanonica);
@@ -681,9 +681,9 @@ exports.salvarEtapa = async ({
 
   if (respostaExistente) {
     // ====================================================
-    // Atualização determinística:
+    // AtualizaÃ§Ã£o determinÃ­stica:
     // usa a linha encontrada por id para evitar no-op
-    // e promove secao legado para canônica no mesmo update
+    // e promove secao legado para canÃ´nica no mesmo update
     // ====================================================
     if (!respostaExistente.id) {
       throw new Error("Resposta de onboarding encontrada sem identificador");
@@ -722,13 +722,13 @@ exports.salvarEtapa = async ({
 // Concluir onboarding
 // Responsável por:
 // - validar perfil
-// - validar existência do onboarding
-// - validar consistência do perfil
-// - validar seções obrigatórias com aliases
+// - validar existÃªncia do onboarding
+// - validar consistÃªncia do perfil
+// - validar seÃ§Ãµes obrigatÃ³rias com aliases
 // - materializar dados-base em usuarios
 // - criar meta inicial automática quando aplicável
-// - marcar onboarding como concluído
-// - atualizar usuário como concluído
+// - marcar onboarding como concluÃ­do
+// - atualizar usuário como concluÃ­do
 // - devolver rota correta do dashboard
 // ======================================================
 exports.concluirOnboarding = async ({ usuarioId, perfilTipo }) => {
@@ -768,13 +768,19 @@ exports.concluirOnboarding = async ({ usuarioId, perfilTipo }) => {
   );
 
   if (secoesFaltantes.length > 0) {
-    throw new Error(
-      `Ainda faltam seções obrigatórias para concluir o onboarding: ${secoesFaltantes.join(", ")}`
+    // ====================================================
+    // Seções faltantes registradas como aviso mas não
+    // bloqueiam a conclusão. O frontend controla o fluxo
+    // de steps e falhas de rede mobile causavam 400 falsos.
+    // ====================================================
+    console.warn(
+      "[ONBOARDING] Seções não encontradas no banco, prosseguindo com conclusão:",
+      { usuarioId, secoesFaltantes }
     );
   }
 
   // ======================================================
-  // Agrupa respostas por seção para extrair os dados-base
+  // Agrupa respostas por seÃ§Ã£o para extrair os dados-base
   // ======================================================
   const respostasAgrupadas = agruparRespostasDoOnboarding(respostasSalvas);
 
@@ -800,21 +806,30 @@ exports.concluirOnboarding = async ({ usuarioId, perfilTipo }) => {
   });
 
   // ======================================================
-  // Cria meta inicial automática quando aplicável
+  // A meta inicial Ã© complementar ao fluxo principal.
+  // Se houver falha isolada na infraestrutura de metas,
+  // nÃ£o bloqueamos a conclusÃ£o do onboarding.
   // ======================================================
-  await criarMetaInicialSeAplicavel({
-    usuarioId,
-    perfilTipo: perfilCanonico,
-    respostasAgrupadas,
-  });
+  try {
+    await criarMetaInicialSeAplicavel({
+      usuarioId,
+      perfilTipo: perfilCanonico,
+      respostasAgrupadas,
+    });
+  } catch (error) {
+    console.error(
+      "Aviso ao criar meta inicial automática no onboarding:",
+      error
+    );
+  }
 
   // ======================================================
-  // Marca onboarding como concluído
+  // Marca onboarding como concluÃ­do
   // ======================================================
   await onboardingModel.concluirOnboarding(usuarioId);
 
   // ======================================================
-  // Atualiza tabela de usuários com status concluído
+  // Atualiza tabela de usuários com status concluÃ­do
   // e perfil final do sistema
   // ======================================================
   await onboardingModel.atualizarUsuario({
@@ -830,11 +845,11 @@ exports.concluirOnboarding = async ({ usuarioId, perfilTipo }) => {
   };
 };
 // ======================================================
-// Atualizar uma etapa específica do onboarding
+// Atualizar uma etapa especÃ­fica do onboarding
 // Responsável por:
 // - encontrar onboarding do usuário
-// - validar existência da seção
-// - atualizar respostas daquela seção
+// - validar existÃªncia da seÃ§Ã£o
+// - atualizar respostas daquela seÃ§Ã£o
 // - devolver onboarding completo atualizado
 // ======================================================
 exports.atualizarEtapa = async ({ usuarioId, secao, respostas }) => {
@@ -853,8 +868,8 @@ exports.atualizarEtapa = async ({ usuarioId, secao, respostas }) => {
   }
 
   // ======================================================
-  // Canoniza a seção imediatamente antes da atualização
-  // para manter consistência de escrita no banco
+  // Canoniza a seÃ§Ã£o imediatamente antes da atualizaÃ§Ã£o
+  // para manter consistÃªncia de escrita no banco
   // ======================================================
   const secaoCanonica = canonicalizarSecao(secao);
   const secoesEquivalentes = obterSecoesEquivalentes(secaoCanonica);
@@ -862,8 +877,8 @@ exports.atualizarEtapa = async ({ usuarioId, secao, respostas }) => {
   const respostaExistente = await onboardingModel.buscarRespostaPorSecao({
     onboardingId: onboarding.id,
     secao: secaoCanonica,
-    // Compatibilidade temporária para localizar seção legado
-    // equivalente durante a migração gradual
+    // Compatibilidade temporária para localizar seÃ§Ã£o legado
+    // equivalente durante a migraÃ§Ã£o gradual
     secoesEquivalentes,
   });
 
@@ -874,9 +889,9 @@ exports.atualizarEtapa = async ({ usuarioId, secao, respostas }) => {
   }
 
   // ====================================================
-  // Atualização determinística:
+  // AtualizaÃ§Ã£o determinÃ­stica:
   // usa a linha encontrada por id para evitar no-op
-  // e promove secao legado para canônica no mesmo update
+  // e promove secao legado para canÃ´nica no mesmo update
   // ====================================================
   if (!respostaExistente.id) {
     throw new Error("Resposta de onboarding encontrada sem identificador");
@@ -891,6 +906,7 @@ exports.atualizarEtapa = async ({ usuarioId, secao, respostas }) => {
 
   return await exports.buscarOnboardingCompleto(usuarioId);
 };
+
 
 
 

@@ -21,13 +21,12 @@ const PERFIL_UNICO_ATIVO = "usuario";
 // Essas regras serão usadas na conclusão do onboarding
 // ======================================================
 const SECOES_OBRIGATORIAS_POR_PERFIL = {
-  usuario: ["goal", "body_data", "routine", "nutrition", "motivation"],
   // ====================================================
-  // IMPORTANTE:
-  // As seções obrigatórias abaixo foram alinhadas com os
-  // IDs reais usados no frontend atual (src/data/onboardingConfig.js).
+  // IDs alinhados com os valores reais enviados pelo
+  // frontend (src/data/onboardingConfig.js).
   // Isso evita bloqueio falso de conclusão no passo final.
   // ====================================================
+  usuario: ["objetivo", "dados-fisicos", "rotina", "alimentacao", "motivacao"],
   personal: [
     "atuacao-profissional",
     "modelo-acompanhamento-personal",
