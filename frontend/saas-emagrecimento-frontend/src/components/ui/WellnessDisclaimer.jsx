@@ -25,9 +25,7 @@ export default function WellnessDisclaimer({
           light ? "text-slate-200" : "text-slate-700"
         } ${compact ? "text-xs leading-5" : "text-sm leading-6"}`}
       >
-        O Fitelligence oferece estimativas e orientaÃ§Ãµes gerais de fitness e
-        bem-estar. Ele nÃ£o substitui orientaÃ§Ã£o mÃ©dica, nutricional ou
-        diagnÃ³stico profissional.
+        O Fitelligence oferece estimativas e orientações gerais de fitness e bem-estar. Ele não substitui orientação médica, nutricional ou diagnóstico profissional.
       </p>
     </div>
   );
