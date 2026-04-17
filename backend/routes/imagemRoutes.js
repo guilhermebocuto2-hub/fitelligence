@@ -5,6 +5,7 @@ const imagemController = require('../controllers/imagemController');
 const authMiddleware = require('../middlewares/authMiddleware');
 const upload = require('../middlewares/upload');
 const checkLimitePlano = require('../middlewares/checkLimitePlano');
+const requirePlan = require('../middlewares/requirePlan');
 
 router.post(
   '/refeicao',
@@ -17,6 +18,7 @@ router.post(
 router.post(
   '/corporal',
   authMiddleware,
+  requirePlan(['premium']),
   upload.single('imagem'),
   imagemController.enviarImagemCorporal
 );
