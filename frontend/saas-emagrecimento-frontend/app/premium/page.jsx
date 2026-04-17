@@ -75,7 +75,7 @@ const PLAN_OPTIONS = {
   yearly: {
     id: "yearly",
     title: "Plano anual",
-    price: "R$ 119,90",
+    price: "R$ 209,90",
     period: "/ano",
     description: "Melhor custo-benefício para evolução contínua",
     badge: "Mais escolhido",
