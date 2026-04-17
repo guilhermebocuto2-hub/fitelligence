@@ -27,8 +27,8 @@ export default function TomorrowPreviewCard({ planoDoDia = null, dashboard = {} 
     <PremiumCard className="rounded-[28px]">
       <SectionHeader
         eyebrow="Amanha"
-        title="Preview do proximo dia"
-        description="Uma leitura leve para manter expectativa e retorno diario."
+        title="Preview do próximo dia"
+        description="Uma leitura leve para manter expectativa e retorno diário."
       />
 
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
@@ -54,12 +54,12 @@ export default function TomorrowPreviewCard({ planoDoDia = null, dashboard = {} 
 
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-            Meta calorica
+            Meta calórica
           </p>
           <p className="mt-2 text-lg font-bold text-slate-900">
             {toNumber(alimentacao?.calorias, 0)} kcal
           </p>
-          <p className="mt-1 text-sm text-slate-500">Referencia para seu proximo dia</p>
+          <p className="mt-1 text-sm text-slate-500">Referência para seu próximo dia</p>
         </div>
       </div>
     </PremiumCard>

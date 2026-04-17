@@ -204,8 +204,8 @@ export default function DailyPlanCard({
     <PremiumCard className="rounded-[28px]">
       <SectionHeader
         eyebrow="Plano do dia"
-        title="Seu plano diario"
-        description="Resumo operacional do dia com foco em treino, calorias, hidratacao e execucao."
+        title="Seu plano diário"
+        description="Resumo operacional do dia com foco em treino, calorias, hidratação e execução."
       />
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -218,11 +218,11 @@ export default function DailyPlanCard({
             {treino.titulo || "Plano leve do dia"}
           </p>
           <p className="mt-1 text-sm text-slate-600">
-            {toNumber(treino.duracao_min, 0) || "--"} min ââ‚¬Â¢{" "}
+            {toNumber(treino.duracao_min, 0) || "--"} min •{" "}
             {treino.intensidade || "--"}
           </p>
           <p className="mt-2 text-sm font-medium text-slate-700">
-            {execution.treino_concluido ? "Treino concluido hoje" : "Treino pendente"}
+            {execution.treino_concluido ? "Treino concluído hoje" : "Treino pendente"}
           </p>
         </div>
 
@@ -236,21 +236,21 @@ export default function DailyPlanCard({
           </p>
           <p className="mt-1 text-sm text-slate-600">
             {refeicoes.length > 0
-              ? `${refeicoes.length} refeicoes planejadas`
-              : "Meta calorica definida a partir do seu onboarding"}
+              ? `${refeicoes.length} refeições planejadas`
+              : "Meta calórica definida a partir do seu onboarding"}
           </p>
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
           <div className="flex items-center gap-2 text-slate-900">
             <Droplets className="h-4 w-4 text-sky-500" />
-            <p className="text-sm font-semibold">Agua</p>
+            <p className="text-sm font-semibold">Água</p>
           </div>
           <p className="mt-2 text-lg font-bold text-slate-900">
             {aguaHoje} / {metaAgua || "--"} ml
           </p>
           <p className="mt-1 text-sm text-slate-600">
-            {toNumber(habitos.passos, 0)} passos ââ‚¬Â¢ {habitos.sono_horas || "--"}{" "}
+            {toNumber(habitos.passos, 0)} passos • {habitos.sono_horas || "--"}{" "}
             h sono
           </p>
           <p className="mt-2 text-sm font-medium text-slate-700">
@@ -261,7 +261,7 @@ export default function DailyPlanCard({
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
           <div className="flex items-center gap-2 text-slate-900">
             <Sparkles className="h-4 w-4 text-violet-500" />
-            <p className="text-sm font-semibold">Acao principal</p>
+            <p className="text-sm font-semibold">Ação principal</p>
           </div>
           <p className="mt-2 text-lg font-bold text-slate-900">
             {acaoPrincipal.titulo || "Seguir plano do dia"}

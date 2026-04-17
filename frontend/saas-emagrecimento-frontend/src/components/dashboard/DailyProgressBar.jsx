@@ -13,7 +13,7 @@ export default function DailyProgressBar({ scoreDia = 0 }) {
         <div>
           <p className="text-sm font-semibold text-slate-900">Progresso do dia</p>
           <p className="text-sm text-slate-500">
-            Seu score diario acompanha a execucao do plano.
+            Seu score diário acompanha a execução do plano.
           </p>
         </div>
 

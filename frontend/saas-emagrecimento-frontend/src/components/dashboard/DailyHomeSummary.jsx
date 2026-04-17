@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 // ======================================================
 // DailyHomeSummary
@@ -283,6 +283,7 @@ export default function DailyHomeSummary({
   const metaPassos = toNumber(dashboard?.meta_passos, 0);
   const aguaHoje = toNumber(resumoExecucao?.agua_hoje, 0);
   const passosHoje = toNumber(resumoExecucao?.passos_hoje, 0);
+  const metaCaloricaReal = toNumber(dashboard?.meta_calorica, target);
 
   const dayProgress =
     target > 0
@@ -347,7 +348,7 @@ export default function DailyHomeSummary({
     ? `${toNumber(dayPlan?.calorias, 0)} kcal • ${
         toNumber(dayPlan?.proteina, 0) || "--"
       }g proteina • ${toNumber(dayPlan?.carboidrato, 0) || "--"}g carbo`
-    : "Sem plano recente identificado. Registre refeicoes para receber orientacoes mais personalizadas.";
+    : "Sem plano recente identificado. Registre refeições para receber orientações mais personalizadas.";
 
   return (
     <div className="space-y-4 sm:space-y-5">
@@ -374,7 +375,7 @@ export default function DailyHomeSummary({
               Meta diaria
             </p>
             <p className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
-              {target} kcal
+              {metaCaloricaReal} kcal
             </p>
           </div>
         </div>
@@ -403,7 +404,7 @@ export default function DailyHomeSummary({
 
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
-              Acao principal
+              Ação principal
             </p>
             <h3 className="mt-1 text-lg font-semibold tracking-tight text-slate-900">
               {mainAction.title}
@@ -539,8 +540,8 @@ export default function DailyHomeSummary({
       <PremiumCard className="rounded-[28px]">
         <SectionHeader
           eyebrow="Plano do dia"
-          title="Sua orientacao de hoje"
-          description="Resumo enxuto para facilitar execucao sem poluicao visual."
+          title="Sua orientação de hoje"
+          description="Resumo enxuto para facilitar execução sem poluição visual."
         />
 
         <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">

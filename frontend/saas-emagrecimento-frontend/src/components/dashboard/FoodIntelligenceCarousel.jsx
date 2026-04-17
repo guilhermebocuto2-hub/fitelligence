@@ -115,7 +115,7 @@ export default function FoodIntelligenceCarousel({ dashboard }) {
               title="Calorias medias"
               value={toOneDecimal(caloriasMedias)}
               suffix="kcal"
-              helper="Media energetica das refeicoes analisadas."
+              helper="Média energética das refeições analisadas."
             />
 
             <FoodIntelligenceCard
@@ -123,7 +123,7 @@ export default function FoodIntelligenceCarousel({ dashboard }) {
               title="Proteina media"
               value={toOneDecimal(proteinaMedia)}
               suffix="g"
-              helper="Media proteica para suporte de composicao corporal."
+              helper="Média proteica para suporte de composição corporal."
             />
 
             <FoodIntelligenceCard
