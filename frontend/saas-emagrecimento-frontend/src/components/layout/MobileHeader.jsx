@@ -1,7 +1,8 @@
 "use client";
 
 import { memo } from "react";
-import { Flame, Target } from "lucide-react";
+import { Flame, LogOut, Target } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
 
 function MobileHeaderComponent({
@@ -11,8 +12,10 @@ function MobileHeaderComponent({
   streakDias = null,
   indicatorLabel = "",
 }) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const primeiroNome = user?.nome?.split(" ")[0] || "Voce";
+  const router = useRouter();
+  function handleLogout() { logout(); router.push("/login"); }
 
   return (
     <header className="sticky top-0 z-30 border-b border-[#2A2A2A] bg-[#0F0F0F]/95 backdrop-blur-xl lg:hidden">
@@ -30,7 +33,13 @@ function MobileHeaderComponent({
             </p>
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col items-end gap-2">
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center rounded-xl border border-[#2A2A2A] bg-[#1A1A1A] p-1.5 text-[#9CA3AF] hover:text-[#EF4444]"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+              </button>
             {scoreDia !== null ? (
               <div className="inline-flex items-center gap-2 rounded-2xl border border-[#2A2A2A] bg-[#1A1A1A] px-3 py-2 text-xs font-semibold text-[#10B981]">
                 <Target className="h-4 w-4" />
