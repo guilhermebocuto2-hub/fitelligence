@@ -1119,7 +1119,7 @@ export default function OnboardingPage() {
             type="button"
             onClick={handleVoltar}
             disabled={currentStepIndex === 0 || submitting}
-            className="h-12 rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-white transition hover:bg-white/10 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-12 rounded-2xl border border-[#2A2A2A] bg-[#1A1A1A] px-4 text-sm font-semibold text-white transition hover:bg-[#2A2A2A] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
             Voltar
           </button>
@@ -1128,7 +1128,7 @@ export default function OnboardingPage() {
             type="button"
             onClick={handleSalvarEContinuar}
             disabled={submitting}
-            className="h-12 rounded-2xl bg-white px-4 text-sm font-semibold text-slate-950 transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
+            className="h-12 rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-4 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
           >
             {submitting
               ? "Salvando..."
