@@ -22,10 +22,16 @@ function MobileHeaderComponent({
     setIsDark(document.documentElement.classList.contains("dark"));
   }, []);
   function toggleTheme() {
-    const next = !isDark;
-    document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("fitelligence-theme", next ? "dark" : "light");
-    setIsDark(next);
+    const currentlyDark = document.documentElement.classList.contains("dark");
+    if (currentlyDark) {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("fitelligence-theme", "light");
+      setIsDark(false);
+    } else {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("fitelligence-theme", "dark");
+      setIsDark(true);
+    }
   }
 
   return (
