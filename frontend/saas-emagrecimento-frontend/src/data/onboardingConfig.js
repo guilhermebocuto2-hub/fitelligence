@@ -132,9 +132,12 @@ export const stepDefinitions = {
       {
         id: "altura",
         name: "altura",
-        label: "Altura (cm)",
+        label: "Altura (m)",
         type: "number",
-        placeholder: "Ex: 175",
+        placeholder: "Ex: 1.75",
+        step: 0.01,
+        min: 1.0,
+        max: 2.5,
         required: false,
       },
       {

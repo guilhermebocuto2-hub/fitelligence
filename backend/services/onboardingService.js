@@ -151,9 +151,17 @@ function extrairDadosBaseDoOnboarding({ perfilTipo, respostasAgrupadas }) {
 
   // ====================================================
   // Altura:
-  // Ãºtil principalmente para usuário final
+  // O frontend envia em metros (1.75). Normalizamos para cm
+  // (175) para compatibilidade com calcularTmb (Mifflin-St Jeor)
+  // e com o histórico de dados já salvos em cm no banco.
   // ====================================================
-  const altura = perfil?.altura ? Number(perfil.altura) : null;
+  const alturaRaw = perfil?.altura ? Number(perfil.altura) : null;
+  const altura =
+    alturaRaw !== null && Number.isFinite(alturaRaw)
+      ? alturaRaw < 3
+        ? Math.round(alturaRaw * 100) // metros → cm (1.75 → 175)
+        : Math.round(alturaRaw)       // já em cm (175), normaliza inteiro
+      : null;
 
   // ====================================================
   // Peso:

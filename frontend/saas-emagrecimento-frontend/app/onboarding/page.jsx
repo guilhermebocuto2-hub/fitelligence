@@ -186,9 +186,9 @@ export default function OnboardingPage() {
       message: "Informe uma idade entre 13 e 100 anos",
     },
     altura: {
-      min: 120,
-      max: 250,
-      message: "Informe uma altura entre 120 e 250 cm",
+      min: 1.0,
+      max: 2.5,
+      message: "Informe uma altura entre 1.00 e 2.50 m (ex: 1.75)",
     },
     peso: {
       min: 30,
