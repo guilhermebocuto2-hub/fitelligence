@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { getDashboardService } from "../../../src/services/dashboardService";
 import {
   listMealAnalysesService,
@@ -11,6 +12,7 @@ import PremiumCard from "../../../src/components/ui/PremiumCard";
 import SectionHeader from "../../../src/components/ui/SectionHeader";
 import WellnessDisclaimer from "../../../src/components/ui/WellnessDisclaimer";
 import MobileLayout from "../../../src/components/layout/MobileLayout";
+import { useAuth } from "../../../src/context/AuthContext";
 
 // ======================================================
 // TODO: migrar rota para /alimentacao no futuro.
@@ -97,6 +99,12 @@ function CardRefeicao({ refeicao }) {
 }
 
 export default function PlanoAlimentarPage() {
+  const { user } = useAuth();
+  const isPremium = useMemo(
+    () => String(user?.plano || "free").toLowerCase() === "premium",
+    [user]
+  );
+
   const [dashboard, setDashboard] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
@@ -196,6 +204,12 @@ export default function PlanoAlimentarPage() {
     );
   }, [dashboard, resumoAlimentar]);
 
+  // Free: exibe apenas as 3 refeições mais recentes
+  const refeicoesFiltradas = useMemo(() => {
+    if (isPremium) return historicoRefeicoes;
+    return historicoRefeicoes.slice(0, 3);
+  }, [historicoRefeicoes, isPremium]);
+
   const timeline = useMemo(() => {
     const base = {
       cafe_da_manha: [],
@@ -204,13 +218,13 @@ export default function PlanoAlimentarPage() {
       lanche: [],
     };
 
-    historicoRefeicoes.forEach((item) => {
+    refeicoesFiltradas.forEach((item) => {
       const secao = normalizeTipoRefeicao(item?.tipo_refeicao);
       base[secao].push(item);
     });
 
     return base;
-  }, [historicoRefeicoes]);
+  }, [refeicoesFiltradas]);
 
   async function handleUploadRefeicao(file) {
     if (!file) return;
@@ -379,7 +393,6 @@ export default function PlanoAlimentarPage() {
           description="Organizacao clara por periodo para facilitar acompanhamento diario."
         />
 
-        {/* TODO: limitar histórico completo no plano free */}
         <div className="mt-4 space-y-4">
           {PERIODOS_TIMELINE.map((periodo) => {
             const itens = timeline[periodo.key] || [];
@@ -413,6 +426,23 @@ export default function PlanoAlimentarPage() {
             );
           })}
         </div>
+
+        {!isPremium && historicoRefeicoes.length > 3 ? (
+          <div className="mt-4 rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 via-white to-indigo-50 p-4">
+            <p className="text-sm font-semibold text-slate-900">
+              Histórico completo disponível no Premium
+            </p>
+            <p className="mt-1 text-xs leading-5 text-slate-600">
+              Você tem {historicoRefeicoes.length} refeições registradas. No plano free são exibidas apenas as 3 mais recentes.
+            </p>
+            <Link
+              href="/premium"
+              className="mt-3 inline-flex items-center rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-4 py-2 text-xs font-semibold text-white shadow-sm active:scale-[0.97]"
+            >
+              Ver plano Premium
+            </Link>
+          </div>
+        ) : null}
       </PremiumCard>
 
       {/* =================================================
@@ -425,12 +455,28 @@ export default function PlanoAlimentarPage() {
           title="Leitura de IA"
           description="Resumo curto para orientar sua próxima decisao alimentar."
         />
-        <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
-          {/* TODO: insights avancados como feature premium */}
-          <p className="text-sm font-medium leading-6 text-emerald-800">
-            {insightCurtoIA}
-          </p>
-        </div>
+        {isPremium ? (
+          <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+            <p className="text-sm font-medium leading-6 text-emerald-800">
+              {insightCurtoIA}
+            </p>
+          </div>
+        ) : (
+          <div className="mt-4 rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 via-white to-indigo-50 p-4">
+            <p className="text-sm font-semibold text-slate-900">
+              Disponível no plano Premium
+            </p>
+            <p className="mt-1 text-xs leading-5 text-slate-600">
+              Insights alimentares avançados gerados por IA são exclusivos do plano Premium.
+            </p>
+            <Link
+              href="/premium"
+              className="mt-3 inline-flex items-center rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-4 py-2 text-xs font-semibold text-white shadow-sm active:scale-[0.97]"
+            >
+              Ver plano Premium
+            </Link>
+          </div>
+        )}
       </PremiumCard>
 
       {/* =================================================
