@@ -18,12 +18,12 @@ export default function SectionHeader({
           </p>
         ) : null}
 
-        <h2 className="mt-1 text-lg font-semibold tracking-tight text-white sm:text-xl">
+        <h2 className="mt-1 text-lg font-semibold tracking-tight text-[var(--text-primary)] sm:text-xl">
           {title}
         </h2>
 
         {description ? (
-          <p className="mt-1.5 max-w-2xl text-sm leading-6 text-[#9CA3AF]">
+          <p className="mt-1.5 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
             {description}
           </p>
         ) : null}

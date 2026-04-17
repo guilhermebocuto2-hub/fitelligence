@@ -15,7 +15,7 @@ import MobileBottomNav from "./MobileBottomNav";
 
 export default function DashboardLayout({ children }) {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#0F0F0F] text-white">
+    <div className="min-h-screen overflow-x-hidden bg-[var(--bg-primary)] text-[var(--text-primary)]">
       <div className="flex min-h-screen">
         <Sidebar />
 

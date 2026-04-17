@@ -3,6 +3,24 @@
 /* Dark mode ativado pela classe .dark no elemento html */
 @variant dark (&:where(.dark, .dark *));
 
+:root {
+  --bg-primary: #FFFFFF;
+  --bg-card: #F3F4F6;
+  --bg-surface: #E5E7EB;
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+  --border-color: #D1D5DB;
+}
+
+.dark {
+  --bg-primary: #0F0F0F;
+  --bg-card: #1A1A1A;
+  --bg-surface: #2A2A2A;
+  --text-primary: #FFFFFF;
+  --text-secondary: #9CA3AF;
+  --border-color: #2A2A2A;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -16,8 +34,8 @@ body {
 }
 
 body {
-  background: #0F0F0F;
-  color: #FFFFFF;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 button,

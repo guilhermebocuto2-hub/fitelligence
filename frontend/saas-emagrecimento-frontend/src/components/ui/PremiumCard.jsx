@@ -17,7 +17,7 @@ export default function PremiumCard({
   return (
     <Component
       className={`
-        relative overflow-hidden rounded-3xl border border-[#2A2A2A] bg-[#1A1A1A]
+        relative overflow-hidden rounded-3xl border border-[var(--border-color)] bg-[var(--bg-card)]
         ${compact ? "p-4 sm:p-5" : "p-5 sm:p-6"}
         shadow-[0_10px_30px_rgba(0,0,0,0.3)]
         ${interactive ? "transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(0,0,0,0.45)]" : ""}

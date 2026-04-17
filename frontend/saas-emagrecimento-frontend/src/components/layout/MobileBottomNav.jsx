@@ -51,8 +51,8 @@ function MobileBottomNavComponent() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-[#2A2A2A] bg-[#0F0F0F] px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 lg:hidden">
-      <div className="mx-auto grid max-w-lg grid-cols-5 gap-1 rounded-[28px] border border-[#2A2A2A] bg-[#1A1A1A] p-2 shadow-[0_18px_45px_rgba(0,0,0,0.6)]">
+    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-[var(--border-color)] bg-[var(--bg-primary)] px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 lg:hidden">
+      <div className="mx-auto grid max-w-lg grid-cols-5 gap-1 rounded-[28px] border border-[var(--border-color)] bg-[var(--bg-card)] p-2 shadow-[0_18px_45px_rgba(0,0,0,0.6)]">
         {mobileNavigation.map((item) => {
           const Icon = item.icon;
 
@@ -79,7 +79,7 @@ function MobileBottomNavComponent() {
                     : "text-[#7C3AED]/70 hover:bg-[#7C3AED]/10 hover:text-[#7C3AED]"
                   : isActive
                   ? "bg-[#7C3AED]/15 text-[#7C3AED]"
-                  : "text-[#6B7280] hover:bg-[#2A2A2A] hover:text-white"
+                  : "text-[#6B7280] hover:bg-[var(--bg-surface)] hover:text-white"
               }`}
             >
               {isActive ? (
@@ -96,7 +96,7 @@ function MobileBottomNavComponent() {
                       : "text-[#7C3AED]/60 group-hover:bg-[#7C3AED]/10 group-hover:text-[#7C3AED]"
                     : isActive
                     ? "bg-[#7C3AED]/20 text-[#7C3AED]"
-                    : "text-[#6B7280] group-hover:bg-[#2A2A2A] group-hover:text-white"
+                    : "text-[#6B7280] group-hover:bg-[var(--bg-surface)] group-hover:text-white"
                 }`}
               >
                 <Icon className="h-4 w-4" />
