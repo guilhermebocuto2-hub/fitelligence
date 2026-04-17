@@ -20,6 +20,11 @@ const pool = railwayDatabaseUrl
         user: decodeURIComponent(parsedUrl.username),
         password: decodeURIComponent(parsedUrl.password),
         database: parsedUrl.pathname.replace(/^\//, ""),
+        // ==================================================
+        // Forca UTF-8 real na conexao para evitar gravacao e
+        // leitura ambigua dependendo do default do servidor.
+        // ==================================================
+        charset: "utf8mb4",
         waitForConnections: true,
         connectionLimit: 10,
         maxIdle: 10,
@@ -32,12 +37,16 @@ const pool = railwayDatabaseUrl
   : mysql.createPool({
       host: process.env.DB_HOST || "localhost",
       port: Number(process.env.DB_PORT || 3306),
-      user: process.env.DB_USER || "root",
-      password: process.env.DB_PASSWORD || "",
-      database: process.env.DB_NAME || "saas_emagrecimento",
-      waitForConnections: true,
-      connectionLimit: 10,
-      maxIdle: 10,
+    user: process.env.DB_USER || "root",
+    password: process.env.DB_PASSWORD || "",
+    database: process.env.DB_NAME || "saas_emagrecimento",
+    // ====================================================
+    // Mantem o mesmo charset tambem no ambiente local.
+    // ====================================================
+    charset: "utf8mb4",
+    waitForConnections: true,
+    connectionLimit: 10,
+    maxIdle: 10,
       idleTimeout: 60000,
       queueLimit: 0,
       enableKeepAlive: true,
@@ -77,7 +86,7 @@ async function ensureOnboardingsTable(connection) {
       etapa_atual INT NULL,
       status VARCHAR(50) NULL,
       concluido_em DATETIME NULL
-    )
+    ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
   `);
 }
 
@@ -93,7 +102,7 @@ async function ensureOnboardingRespostasTable(connection) {
       perfil_tipo VARCHAR(50) NULL,
       secao VARCHAR(100) NOT NULL,
       respostas_json LONGTEXT NULL
-    )
+    ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
   `);
 }
 
@@ -148,6 +157,87 @@ async function initializeOnboardingTables(connection) {
     console.log("Tabela onboarding_respostas verificada/criada com sucesso");
   } catch (err) {
     console.error("Erro ao inicializar estrutura de onboarding:", err);
+  }
+}
+
+// ======================================================
+// Garante a tabela imagens
+// ======================================================
+async function ensureImagensTable(connection) {
+  await connection.query(`
+    CREATE TABLE IF NOT EXISTS imagens (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      usuario_id INT NOT NULL,
+      tipo VARCHAR(50) NULL,
+      nome_arquivo VARCHAR(255) NULL,
+      caminho_arquivo TEXT NULL,
+      descricao TEXT NULL,
+      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+  `);
+}
+
+// ======================================================
+// Garante a tabela analises_refeicao
+// ======================================================
+async function ensureAnalisesRefeicaoTable(connection) {
+  await connection.query(`
+    CREATE TABLE IF NOT EXISTS analises_refeicao (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      usuario_id INT NOT NULL,
+      imagem_id INT NULL,
+      nome_arquivo VARCHAR(255) NULL,
+      tipo_refeicao VARCHAR(100) NULL,
+      descricao TEXT NULL,
+      calorias_estimadas INT NULL,
+      proteinas DECIMAL(10,2) NULL,
+      carboidratos DECIMAL(10,2) NULL,
+      gorduras DECIMAL(10,2) NULL,
+      classificacao VARCHAR(100) NULL,
+      observacoes TEXT NULL,
+      sugestao_proximo_passo TEXT NULL,
+      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+  `);
+}
+
+// ======================================================
+// Garante a tabela analises_corporais
+// ======================================================
+async function ensureAnalisesCorpTable(connection) {
+  await connection.query(`
+    CREATE TABLE IF NOT EXISTS analises_corporais (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      usuario_id INT NOT NULL,
+      imagem_id INT NOT NULL,
+      imagem_anterior_id INT NULL,
+      resumo_visual TEXT NULL,
+      pontos_de_evolucao JSON NULL,
+      pontos_de_atencao JSON NULL,
+      consistencia_percebida VARCHAR(100) NULL,
+      recomendacao_curta VARCHAR(255) NULL,
+      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+  `);
+}
+
+// ======================================================
+// Inicialização das tabelas de mídia e análises
+// - Ordem: imagens primeiro (referenciada pelas demais)
+// - Não derruba o servidor se falhar isoladamente
+// ======================================================
+async function initializeMediaTables(connection) {
+  try {
+    await ensureImagensTable(connection);
+    console.log("Tabela imagens verificada/criada com sucesso");
+
+    await ensureAnalisesRefeicaoTable(connection);
+    console.log("Tabela analises_refeicao verificada/criada com sucesso");
+
+    await ensureAnalisesCorpTable(connection);
+    console.log("Tabela analises_corporais verificada/criada com sucesso");
+  } catch (err) {
+    console.error("Erro ao inicializar tabelas de mídia e análises:", err);
   }
 }
 
@@ -236,8 +326,37 @@ async function ensureUsuariosTable(connection) {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       UNIQUE KEY uq_usuarios_email (email)
-    )
+    ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
   `);
+}
+
+// ======================================================
+// Garante que tabelas criticas do fluxo principal usem
+// UTF-8 real mesmo em bancos ja existentes.
+// ======================================================
+async function ensureTableUtf8mb4(connection, tableName) {
+  const [rows] = await connection.query(
+    `
+      SELECT TABLE_COLLATION
+      FROM INFORMATION_SCHEMA.TABLES
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = ?
+      LIMIT 1
+    `,
+    [tableName]
+  );
+
+  const tableCollation = String(rows?.[0]?.TABLE_COLLATION || "").toLowerCase();
+
+  if (tableCollation.startsWith("utf8mb4_")) {
+    return;
+  }
+
+  await connection.query(
+    `ALTER TABLE ${tableName} CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+  );
+
+  console.log(`Charset UTF-8 validado na tabela ${tableName}`);
 }
 
 // ======================================================
@@ -311,9 +430,13 @@ async function initializeDatabase() {
 
     await ensureUsuariosTable(connection);
     console.log("Tabela usuarios verificada/criada com sucesso");
+    await ensureTableUtf8mb4(connection, "usuarios");
     await ensureUsuariosColumns(connection);
     await ensureUsuariosIndexes(connection);
     await initializeOnboardingTables(connection);
+    await ensureTableUtf8mb4(connection, "onboardings");
+    await ensureTableUtf8mb4(connection, "onboarding_respostas");
+    await initializeMediaTables(connection);
     console.log("Estrutura das tabelas usuarios e onboarding validada com sucesso");
   } catch (err) {
     console.error("Erro ao inicializar estrutura da tabela usuarios:", err);
@@ -343,6 +466,15 @@ async function testConnection() {
   }
 }
 
-testConnection();
+// ======================================================
+// Bootstrap automatico do banco:
+// - no runtime normal do backend, mantemos o teste e a
+//   inicializacao da estrutura como antes
+// - scripts manuais podem definir SKIP_DB_BOOTSTRAP=true
+//   para reutilizar o mesmo pool sem efeitos colaterais
+// ======================================================
+if (process.env.SKIP_DB_BOOTSTRAP !== "true") {
+  testConnection();
+}
 
 module.exports = pool;
