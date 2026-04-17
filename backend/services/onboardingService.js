@@ -799,16 +799,22 @@ exports.concluirOnboarding = async ({ usuarioId, perfilTipo }) => {
   // Atualiza a tabela principal de usuários com os dados
   // mais importantes do onboarding
   // ======================================================
+  console.log("[ONBOARDING] step: updateDadosBaseFromOnboarding", {
+    usuarioId,
+    dadosBaseUsuario,
+    metasOperacionais,
+  });
   await UsuarioModel.updateDadosBaseFromOnboarding({
     usuarioId,
     ...dadosBaseUsuario,
     ...metasOperacionais,
   });
+  console.log("[ONBOARDING] step: updateDadosBaseFromOnboarding OK");
 
   // ======================================================
-  // A meta inicial Ã© complementar ao fluxo principal.
+  // A meta inicial é complementar ao fluxo principal.
   // Se houver falha isolada na infraestrutura de metas,
-  // nÃ£o bloqueamos a conclusÃ£o do onboarding.
+  // não bloqueamos a conclusão do onboarding.
   // ======================================================
   try {
     await criarMetaInicialSeAplicavel({
@@ -818,24 +824,28 @@ exports.concluirOnboarding = async ({ usuarioId, perfilTipo }) => {
     });
   } catch (error) {
     console.error(
-      "Aviso ao criar meta inicial automática no onboarding:",
+      "Aviso ao criar meta inicial automatica no onboarding:",
       error
     );
   }
 
   // ======================================================
-  // Marca onboarding como concluÃ­do
+  // Marca onboarding como concluído
   // ======================================================
+  console.log("[ONBOARDING] step: concluirOnboarding (model)", { usuarioId });
   await onboardingModel.concluirOnboarding(usuarioId);
+  console.log("[ONBOARDING] step: concluirOnboarding (model) OK");
 
   // ======================================================
-  // Atualiza tabela de usuários com status concluÃ­do
+  // Atualiza tabela de usuários com status concluído
   // e perfil final do sistema
   // ======================================================
+  console.log("[ONBOARDING] step: atualizarUsuario", { usuarioId, perfilCanonico });
   await onboardingModel.atualizarUsuario({
     usuarioId,
     perfilTipo: perfilCanonico,
   });
+  console.log("[ONBOARDING] step: atualizarUsuario OK");
 
   const onboardingAtualizado = await exports.buscarOnboardingCompleto(usuarioId);
 

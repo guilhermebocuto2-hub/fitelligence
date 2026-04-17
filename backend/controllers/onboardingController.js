@@ -137,11 +137,23 @@ exports.concluirOnboarding = async (req, res) => {
       redirecionar_para: resultado.redirecionarPara,
     });
   } catch (error) {
-    console.error("Erro ao concluir onboarding:", error);
+    console.error("ERRO COMPLETO concluirOnboarding:", {
+      message: error.message,
+      code: error.code,
+      errno: error.errno,
+      sqlState: error.sqlState,
+      sqlMessage: error.sqlMessage,
+      sql: error.sql,
+      stack: error.stack,
+    });
 
     return res.status(400).json({
       mensagem: "Erro ao concluir onboarding",
       erro: error.message,
+      // Detalhes de SQL expostos apenas fora de produção
+      ...(process.env.NODE_ENV !== "production" && {
+        detalhe: error.sqlMessage || error.code || null,
+      }),
     });
   }
 };
