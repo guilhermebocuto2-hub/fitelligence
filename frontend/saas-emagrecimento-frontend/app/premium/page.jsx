@@ -560,27 +560,6 @@ export default function PremiumPage() {
               })}
             </div>
 
-            {/* Estado do catalogo da loja com fallback seguro */}
-            <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">
-                Status da cobranca mobile
-              </p>
-              {catalogLoading ? (
-                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
-                  Carregando produtos da Google Play...
-                </p>
-              ) : catalogError ? (
-                <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">{catalogError}</p>
-              ) : catalogMode === "native_android" ? (
-                <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-300">
-                  Loja Android conectada. Os valores exibidos usam catalogo real da Play Store.
-                </p>
-              ) : (
-                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
-                  Em ambiente web, o fluxo segue pelo checkout atual sem impacto no app.
-                </p>
-              )}
-            </div>
           </div>
         </motion.section>
 

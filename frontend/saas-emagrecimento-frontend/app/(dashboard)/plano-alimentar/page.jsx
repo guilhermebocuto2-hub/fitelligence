@@ -10,7 +10,6 @@ import {
 import EmptyState from "../../../src/components/ui/EmptyState";
 import PremiumCard from "../../../src/components/ui/PremiumCard";
 import SectionHeader from "../../../src/components/ui/SectionHeader";
-import WellnessDisclaimer from "../../../src/components/ui/WellnessDisclaimer";
 import MobileLayout from "../../../src/components/layout/MobileLayout";
 import { useAuth } from "../../../src/context/AuthContext";
 
@@ -379,7 +378,7 @@ export default function PlanoAlimentarPage() {
           </div>
         ) : null}
 
-        <WellnessDisclaimer className="mt-4" />
+        <p className="text-xs text-[#9CA3AF] mt-2 px-1">* O Fitelligence oferece estimativas gerais. Não substitui orientação médica profissional.</p>
       </PremiumCard>
 
       {/* =================================================

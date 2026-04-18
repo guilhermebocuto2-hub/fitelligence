@@ -12,7 +12,6 @@ import {
 import EmptyState from "../../../src/components/ui/EmptyState";
 import PremiumCard from "../../../src/components/ui/PremiumCard";
 import SectionHeader from "../../../src/components/ui/SectionHeader";
-import WellnessDisclaimer from "../../../src/components/ui/WellnessDisclaimer";
 import MobileLayout from "../../../src/components/layout/MobileLayout";
 
 function toNumber(value, fallback = 0) {
@@ -304,7 +303,7 @@ export default function ProgressoPage() {
   return (
     <MobileLayout
       title="Progresso"
-      subtitle="Sua evolucao corporal de forma clara"
+      subtitle="Sua evolução corporal de forma clara"
       scoreDia={dashboard?.score_dia ?? null}
       streakDias={dashboard?.streak_dias ?? null}
     >
@@ -312,8 +311,8 @@ export default function ProgressoPage() {
       <PremiumCard>
         <SectionHeader
           eyebrow="IA corporal"
-          title="Analise visual por foto"
-          description="Registre sua evolucao com foco em consistencia e linguagem de bem-estar."
+          title="Análise visual por foto"
+          description="Registre sua evolução com foco em consistência e linguagem de bem-estar."
         />
 
         <input
@@ -329,7 +328,7 @@ export default function ProgressoPage() {
         <button
           type="button"
           onClick={() => inputCorpoRef.current?.click()}
-          className="mt-4 w-full rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white"
+          className="mt-4 w-full rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] px-4 py-4 text-sm font-semibold text-white shadow-lg shadow-violet-500/25"
         >
           {uploadingCorpo ? "Analisando foto..." : "Enviar foto corporal"}
         </button>
@@ -345,7 +344,7 @@ export default function ProgressoPage() {
           </div>
         ) : null}
 
-        <WellnessDisclaimer className="mt-4" />
+        <p className="text-xs text-[#9CA3AF] mt-2 px-1">* O Fitelligence oferece estimativas gerais. Não substitui orientação médica profissional.</p>
       </PremiumCard>
 
       {/* =================================================
@@ -355,7 +354,7 @@ export default function ProgressoPage() {
         <SectionHeader
           eyebrow="Progresso corporal"
           title="Resumo atual"
-          description="Leitura rapida da sua evolucao com foco em motivacao diaria."
+          description="Leitura rápida da sua evolução com foco em motivação diária."
         />
 
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -370,7 +369,7 @@ export default function ProgressoPage() {
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Variacao
+              Variação
             </p>
             <p className="mt-2 text-3xl font-bold tracking-tight text-emerald-700">
               {formatarVariacao(perdaTotal)}
@@ -386,9 +385,9 @@ export default function ProgressoPage() {
           ================================================= */}
       <PremiumCard>
         <SectionHeader
-          eyebrow="Meta de evolucao"
-          title="Evolucao simples"
-          description="Sem graficos complexos: apenas o essencial para foco diario."
+          eyebrow="Meta de evolução"
+          title="Evolução simples"
+          description="Sem gráficos complexos: apenas o essencial para foco diário."
         />
 
         <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-slate-100">
@@ -410,15 +409,15 @@ export default function ProgressoPage() {
           ================================================= */}
       <PremiumCard>
         <SectionHeader
-          eyebrow="Comparacao corporal"
+          eyebrow="Comparação corporal"
           title="Antes e depois"
-          description="Percepcao visual da sua evolucao com estrutura pronta para monetizacao."
+          description="Percepção visual da sua evolução com estrutura pronta para monetização."
         />
 
         {!possuiComparacaoCompleta ? (
           <EmptyState
-            title="Comparacao ainda indisponivel"
-            description="Envie ao menos duas fotos corporais para liberar a comparacao visual."
+            title="Comparação ainda indisponível"
+            description="Envie ao menos duas fotos corporais para liberar a comparação visual."
             className="mt-4 min-h-[160px] rounded-2xl"
           />
         ) : isPremium ? (
@@ -440,7 +439,7 @@ export default function ProgressoPage() {
           <div className="mt-4 grid grid-cols-1 gap-3">
             {/* FREE mostra apenas uma visualizacao limitada */}
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Visualizacao free</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Visualização free</p>
               <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
                 <Image src={imagemAntes} alt="Comparacao corporal limitada no plano free" fill className="object-cover" />
               </div>
@@ -454,10 +453,10 @@ export default function ProgressoPage() {
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-slate-900">
-                    Desbloqueie analise completa no plano premium
+                    Desbloqueie análise completa no plano premium
                   </p>
                   <p className="mt-1 text-xs leading-5 text-slate-600">
-                    Compare antes e depois lado a lado e acompanhe todo o historico visual da evolucao corporal.
+                    Compare antes e depois lado a lado e acompanhe todo o histórico visual da evolução corporal.
                   </p>
                   <Link
                     href="/premium"
@@ -477,15 +476,15 @@ export default function ProgressoPage() {
           ================================================= */}
       <PremiumCard>
         <SectionHeader
-          eyebrow="Historico"
-          title="Ultimas atualizacoes de peso"
-          description="Lista simples para leitura rapida, sem graficos pesados."
+          eyebrow="Histórico"
+          title="Últimas atualizações de peso"
+          description="Lista simples para leitura rápida, sem gráficos pesados."
         />
 
         {historicoExibido.length === 0 ? (
           <EmptyState
             title="Nenhum registro de progresso"
-            description="Assim que houver atualizacoes de peso, elas aparecerao aqui."
+            description="Assim que houver atualizações de peso, elas aparecerão aqui."
             className="mt-4 min-h-[160px] rounded-2xl"
           />
         ) : (
@@ -515,7 +514,7 @@ export default function ProgressoPage() {
           <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Plano free</p>
             <p className="mt-1 text-xs leading-5 text-amber-700">
-              Desbloqueie analise completa no plano premium para ver todo o historico de progresso.
+              Desbloqueie análise completa no plano premium para ver todo o histórico de progresso.
             </p>
           </div>
         ) : null}

@@ -27,6 +27,82 @@ import { getDashboardInsights } from "../../../src/lib/dashboardInsights";
 import { fadeUp, staggerContainer } from "../../../src/lib/motion";
 import { useAuth } from "../../../src/context/AuthContext";
 
+function toObject(value) {
+  return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+}
+
+function toArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function hasMeaningfulContent(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+
+  return Object.values(value).some((item) => {
+    if (Array.isArray(item)) {
+      return item.length > 0;
+    }
+
+    if (item && typeof item === "object") {
+      return Object.keys(item).length > 0;
+    }
+
+    return item !== null && item !== undefined && item !== "";
+  });
+}
+
+// ====================================================
+// Normaliza o payload do dashboard na borda da pagina.
+// Isso evita que cada card precise adivinhar formatos
+// diferentes logo apos onboarding, refresh ou carga
+// parcial da API.
+// ====================================================
+function normalizeDashboardPayload(rawDashboard) {
+  const dashboard = toObject(rawDashboard);
+  const usuario = toObject(dashboard.usuario);
+  const resumoExecucao = toObject(dashboard.resumo_execucao_diaria);
+  const execucaoPlano = toObject(dashboard.execucao_plano_do_dia);
+  const planoDoDia = toObject(dashboard.plano_do_dia);
+  const ultimoPlano = toObject(dashboard.ultimo_plano);
+  const ultimoProgresso = toObject(
+    dashboard.ultimo_progresso || dashboard.ultimo_registro
+  );
+  const motivacaoDoDia = toObject(dashboard.motivacao_do_dia);
+  const coachDoDia = toObject(dashboard.coach_do_dia);
+
+  return {
+    ...dashboard,
+    usuario,
+    resumo_execucao_diaria: resumoExecucao,
+    execucao_plano_do_dia: execucaoPlano,
+    plano_do_dia: hasMeaningfulContent(planoDoDia) ? planoDoDia : null,
+    ultimo_plano: hasMeaningfulContent(ultimoPlano) ? ultimoPlano : null,
+    ultimo_progresso: hasMeaningfulContent(ultimoProgresso)
+      ? ultimoProgresso
+      : null,
+    ultimo_registro: hasMeaningfulContent(ultimoProgresso)
+      ? ultimoProgresso
+      : null,
+    historico_progresso: toArray(dashboard.historico_progresso),
+    historico_execucao_plano: toArray(dashboard.historico_execucao_plano),
+    habitos: toArray(dashboard.habitos),
+    checkins: toArray(dashboard.checkins),
+    metas_ativas: toArray(dashboard.metas_ativas),
+    metas_concluidas: toArray(dashboard.metas_concluidas),
+    alertas: toArray(dashboard.alertas),
+    alertas_alimentares: toArray(dashboard.alertas_alimentares),
+    notificacoes_inteligentes: toArray(dashboard.notificacoes_inteligentes),
+    historico_refeicoes: toArray(dashboard.historico_refeicoes),
+    onboarding_respostas: toObject(dashboard.onboarding_respostas),
+    motivacao_do_dia: hasMeaningfulContent(motivacaoDoDia)
+      ? motivacaoDoDia
+      : null,
+    coach_do_dia: hasMeaningfulContent(coachDoDia) ? coachDoDia : null,
+  };
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
@@ -70,9 +146,15 @@ export default function DashboardPage() {
           );
         }
 
-        setDashboardData(data?.dashboard || {});
+        setDashboardData(normalizeDashboardPayload(data?.dashboard));
       } catch (error) {
         console.error("Erro ao carregar dashboard:", error);
+
+        // ==================================================
+        // Mantem a Home renderizavel mesmo quando a API vier
+        // parcial ou falhar em um refresh logo apos onboarding.
+        // ==================================================
+        setDashboardData({});
 
         showToast({
           title: "Erro ao carregar dashboard",
@@ -150,14 +232,14 @@ export default function DashboardPage() {
 
     return {
       titulo: "Comece por uma acao simples",
-      mensagem: "Agua, check-in ou uma refeicao registrada ja mudam o rumo do dia.",
+      mensagem: "Água, check-in ou uma refeição registrada já mudam o rumo do dia.",
       tom: "atencao",
     };
   }, [dashboardData]);
 
   const dashboardComFallback = useMemo(() => {
     return {
-      ...(dashboardData || {}),
+      ...normalizeDashboardPayload(dashboardData),
       motivacao_do_dia: motivacaoFallback,
       badges_usuario: [
         Number(dashboardData?.streak_dias || 0) >= 1 ? "primeiro_treino" : null,
@@ -205,7 +287,7 @@ export default function DashboardPage() {
   return (
     <MobileLayout
       title="Home"
-      subtitle="Seu plano diario com execucao rapida"
+      subtitle="Seu plano diário com execução rápida"
       scoreDia={dashboardComFallback?.score_dia || 0}
       streakDias={dashboardComFallback?.streak_dias || 0}
     >
