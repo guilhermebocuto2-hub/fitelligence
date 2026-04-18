@@ -26,6 +26,13 @@ import {
   LineChart,
   Utensils,
   BadgePercent,
+  QrCode,
+  FileText,
+  CreditCard,
+  Globe,
+  Copy,
+  ExternalLink,
+  X,
 } from "lucide-react";
 
 // ======================================================
@@ -49,12 +56,25 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
 
   // ====================================================
-  // Estado do plano selecionado
-  // Pode ser:
-  // - mensal
-  // - anual
+  // Estado do plano selecionado: mensal | anual
   // ====================================================
   const [billingCycle, setBillingCycle] = useState("anual");
+
+  // ====================================================
+  // Método de pagamento:
+  //   pix              — QR Code Pix via Asaas
+  //   boleto           — Boleto bancário via Asaas
+  //   cartao_nacional  — Cartão nacional via Asaas
+  //   cartao_internacional — Cartão internacional via Stripe
+  // ====================================================
+  const [paymentMethod, setPaymentMethod] = useState("pix");
+
+  // ====================================================
+  // Dados retornados após criar assinatura Asaas
+  // ====================================================
+  const [pixData, setPixData] = useState(null);    // { pixQrCode, pixQrCodeImage }
+  const [boletoData, setBoletoData] = useState(null); // { boletoUrl, boletoLinhaDigitavel }
+  const [copiado, setCopiado] = useState(false);
 
   // ====================================================
   // Benefícios principais do Premium exibidos no checkout
@@ -126,52 +146,118 @@ export default function CheckoutPage() {
   }, [billingCycle]);
 
   // ====================================================
-  // Cria a sessão de checkout real no Stripe
-  // O backend retorna a URL do checkout hospedado
-  // Também enviamos qual ciclo foi escolhido
+  // Copia texto para a área de transferência
+  // ====================================================
+  async function copiarTexto(texto) {
+    try {
+      await navigator.clipboard.writeText(texto);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2500);
+    } catch {
+      // fallback silencioso
+    }
+  }
+
+  // ====================================================
+  // Checkout via Stripe (cartão internacional)
+  // ====================================================
+  async function handleStripeCheckout() {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Sessão expirada. Faça login novamente.");
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/stripe/create-checkout-session`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ billingCycle }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data?.erro || "Não foi possível iniciar o checkout no Stripe.");
+    }
+
+    if (data?.url) {
+      window.location.href = data.url;
+      return;
+    }
+
+    throw new Error("URL do checkout não retornada pelo backend.");
+  }
+
+  // ====================================================
+  // Checkout via Asaas (PIX, boleto, cartão nacional)
+  // ====================================================
+  async function handleAsaasCheckout() {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Sessão expirada. Faça login novamente.");
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/asaas/create-subscription`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ billingCycle, paymentMethod }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data?.message || "Não foi possível criar a assinatura.");
+    }
+
+    if (paymentMethod === "pix") {
+      setPixData({
+        pixQrCode: data.pixQrCode,
+        pixQrCodeImage: data.pixQrCodeImage,
+        expirationDate: data.expirationDate,
+        valor: data.valor,
+      });
+      return;
+    }
+
+    if (paymentMethod === "boleto") {
+      setBoletoData({
+        boletoUrl: data.boletoUrl,
+        boletoLinhaDigitavel: data.boletoLinhaDigitavel,
+        dueDate: data.dueDate,
+        valor: data.valor,
+      });
+      return;
+    }
+
+    if (paymentMethod === "cartao_nacional" && data.paymentUrl) {
+      window.location.href = data.paymentUrl;
+      return;
+    }
+
+    throw new Error("Resposta inesperada do servidor.");
+  }
+
+  // ====================================================
+  // Handler principal — despacha para o gateway certo
   // ====================================================
   async function handleCheckout() {
     try {
       setLoading(true);
+      setPixData(null);
+      setBoletoData(null);
 
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        throw new Error("Sessão expirada. Faça login novamente.");
+      if (paymentMethod === "cartao_internacional") {
+        await handleStripeCheckout();
+      } else {
+        await handleAsaasCheckout();
       }
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/stripe/create-checkout-session`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            billingCycle,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data?.erro || "Não foi possível iniciar o checkout no Stripe."
-        );
-      }
-
-      // ==================================================
-      // Redireciona o usuário para o checkout hospedado
-      // do Stripe
-      // ==================================================
-      if (data?.url) {
-        window.location.href = data.url;
-        return;
-      }
-
-      throw new Error("URL do checkout não retornada pelo backend.");
     } catch (error) {
       console.error("Erro no checkout:", error);
       alert(error.message || "Erro ao iniciar checkout.");
@@ -324,6 +410,39 @@ export default function CheckoutPage() {
             </div>
 
             {/* ======================================== */}
+            {/* SELETOR DE MÉTODO DE PAGAMENTO */}
+            {/* ======================================== */}
+            <div className="mt-6">
+              <p className="mb-3 text-sm font-semibold text-slate-900 dark:text-white">
+                Forma de pagamento
+              </p>
+
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { id: "pix", label: "Pix", icon: QrCode, desc: "Aprovação imediata" },
+                  { id: "boleto", label: "Boleto", icon: FileText, desc: "Vencimento hoje" },
+                  { id: "cartao_nacional", label: "Cartão Nacional", icon: CreditCard, desc: "Via Asaas" },
+                  { id: "cartao_internacional", label: "Cartão Internacional", icon: Globe, desc: "Via Stripe" },
+                ].map(({ id, label, icon: Icon, desc }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => { setPaymentMethod(id); setPixData(null); setBoletoData(null); }}
+                    className={`rounded-2xl border p-3 text-left transition-all duration-200 ${
+                      paymentMethod === id
+                        ? "border-violet-400 bg-violet-50 dark:border-violet-500 dark:bg-violet-500/10"
+                        : "border-slate-200 bg-slate-50/70 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-950/40 dark:hover:border-slate-700"
+                    }`}
+                  >
+                    <Icon className={`mb-1.5 h-4 w-4 ${paymentMethod === id ? "text-violet-600 dark:text-violet-400" : "text-slate-400"}`} />
+                    <p className="text-xs font-semibold text-slate-900 dark:text-white">{label}</p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">{desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* ======================================== */}
             {/* RESUMO DO PLANO SELECIONADO */}
             {/* ======================================== */}
             <div className="mt-6 rounded-3xl border border-violet-100 bg-violet-50/70 p-5 dark:border-violet-500/20 dark:bg-violet-500/10">
@@ -378,21 +497,135 @@ export default function CheckoutPage() {
             {/* SEGURANÇA */}
             <div className="mt-6 flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400">
               <ShieldCheck className="h-4 w-4" />
-              Pagamento seguro e protegido via Stripe
+              {paymentMethod === "cartao_internacional"
+                ? "Pagamento seguro e protegido via Stripe"
+                : "Pagamento seguro e protegido via Asaas"}
             </div>
 
             {/* BOTÃO */}
-            <button
-              type="button"
-              onClick={handleCheckout}
-              disabled={loading}
-              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] py-3.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {loading
-                ? "Redirecionando..."
-                : `Confirmar ${billingCycle === "anual" ? "plano anual" : "plano mensal"}`}
-              {!loading ? <ArrowRight className="h-4 w-4" /> : null}
-            </button>
+            {!pixData && !boletoData ? (
+              <button
+                type="button"
+                onClick={handleCheckout}
+                disabled={loading}
+                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] py-3.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {loading
+                  ? "Processando..."
+                  : `Confirmar ${billingCycle === "anual" ? "plano anual" : "plano mensal"}`}
+                {!loading ? <ArrowRight className="h-4 w-4" /> : null}
+              </button>
+            ) : null}
+
+            {/* ======================================== */}
+            {/* RESULTADO PIX */}
+            {/* ======================================== */}
+            {pixData ? (
+              <div className="mt-6 rounded-3xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-500/20 dark:bg-emerald-500/10">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                    QR Code Pix gerado
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setPixData(null)}
+                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+
+                {pixData.pixQrCodeImage ? (
+                  <div className="mt-4 flex justify-center">
+                    <img
+                      src={`data:image/png;base64,${pixData.pixQrCodeImage}`}
+                      alt="QR Code Pix"
+                      className="h-48 w-48 rounded-2xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900"
+                    />
+                  </div>
+                ) : null}
+
+                {pixData.pixQrCode ? (
+                  <div className="mt-4">
+                    <p className="mb-2 text-xs text-slate-500 dark:text-slate-400">
+                      Ou copie o código Pix Copia e Cola:
+                    </p>
+                    <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900">
+                      <p className="flex-1 truncate text-xs font-mono text-slate-700 dark:text-slate-300">
+                        {pixData.pixQrCode}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => copiarTexto(pixData.pixQrCode)}
+                        className="flex-shrink-0 rounded-lg bg-violet-100 px-2 py-1 text-xs font-semibold text-violet-700 transition hover:bg-violet-200 dark:bg-violet-500/10 dark:text-violet-300"
+                      >
+                        {copiado ? "Copiado!" : <Copy className="h-3.5 w-3.5" />}
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+
+                <p className="mt-3 text-center text-xs text-slate-500 dark:text-slate-400">
+                  Após o pagamento seu plano será ativado automaticamente
+                </p>
+              </div>
+            ) : null}
+
+            {/* ======================================== */}
+            {/* RESULTADO BOLETO */}
+            {/* ======================================== */}
+            {boletoData ? (
+              <div className="mt-6 rounded-3xl border border-blue-200 bg-blue-50 p-5 dark:border-blue-500/20 dark:bg-blue-500/10">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                    Boleto gerado com sucesso
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setBoletoData(null)}
+                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+
+                {boletoData.boletoLinhaDigitavel ? (
+                  <div className="mt-4">
+                    <p className="mb-2 text-xs text-slate-500 dark:text-slate-400">
+                      Linha digitável:
+                    </p>
+                    <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900">
+                      <p className="flex-1 truncate text-xs font-mono text-slate-700 dark:text-slate-300">
+                        {boletoData.boletoLinhaDigitavel}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => copiarTexto(boletoData.boletoLinhaDigitavel)}
+                        className="flex-shrink-0 rounded-lg bg-violet-100 px-2 py-1 text-xs font-semibold text-violet-700 transition hover:bg-violet-200 dark:bg-violet-500/10 dark:text-violet-300"
+                      >
+                        {copiado ? "Copiado!" : <Copy className="h-3.5 w-3.5" />}
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+
+                {boletoData.boletoUrl ? (
+                  <a
+                    href={boletoData.boletoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] py-3 text-sm font-semibold text-white shadow-sm active:scale-[0.98]"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Abrir boleto
+                  </a>
+                ) : null}
+
+                <p className="mt-3 text-center text-xs text-slate-500 dark:text-slate-400">
+                  Após a compensação do boleto seu plano será ativado (até 3 dias úteis)
+                </p>
+              </div>
+            ) : null}
           </div>
 
           {/* ========================================== */}
@@ -449,12 +682,13 @@ export default function CheckoutPage() {
               </p>
 
               <h3 className="mt-3 text-xl font-bold">
-                Clique em confirmar e finalize no Stripe
+                Escolha o pagamento e confirme
               </h3>
 
               <p className="mt-3 text-sm leading-7 text-slate-300">
-                Ao clicar no botão, você será redirecionado para o ambiente
-                seguro do Stripe para concluir a assinatura premium escolhida.
+                Pix e boleto são processados pelo Asaas. Cartão internacional
+                é processado pelo Stripe. Após a confirmação do pagamento,
+                seu plano Premium é ativado automaticamente.
               </p>
 
               <button
